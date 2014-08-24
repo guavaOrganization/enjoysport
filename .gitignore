@@ -34,3 +34,10 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+/build/
+.classpath
+.project
+.settings/
+html/META-INF
+html/WEB-INF/classes
+.gitignore
