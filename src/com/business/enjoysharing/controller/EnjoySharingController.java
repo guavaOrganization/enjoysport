@@ -7,4 +7,5 @@ public class EnjoySharingController {
 	private int j;
 	
 	private int y;
+	private int q;
 }
