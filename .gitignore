@@ -40,4 +40,5 @@ Icon
 .settings/
 html/META-INF
 .gitignore
-html/WEB-INF
+html/WEB-INF/lib
+html/WEB-INF/classes
