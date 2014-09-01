@@ -7,28 +7,22 @@
 	<!-- 声明WEB应用的描述信息 -->
 	<description>Bootstrap,Spring</description>
 	
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:ApplicationContext.xml</param-value>
-	</context-param>
-	
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-	
+	<!-- 使用SpringMVC配置逻辑 -->
 	<servlet>
 		<servlet-name>EnjoySportFrontController</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>  
-        <param-name>contextConfigLocation</param-name>  
+        <param-name>contextConfigLocation</param-name>
         <param-value>classpath:EnjoySportSpringMVC.xml</param-value>  
     </init-param>  
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>EnjoySportFrontController</servlet-name>
+		<!-- 至拦截enjoysport下*.do的请求 -->
 		<url-pattern>/enjoysport/*</url-pattern>
 	</servlet-mapping>
+	<!-- 使用SpringMVC配置逻辑 -->
 
 	<!-- 欢迎界面 -->
 	<welcome-file-list>
