@@ -20,7 +20,7 @@
 	<servlet-mapping>
 		<servlet-name>EnjoySportFrontController</servlet-name>
 		<!-- 至拦截enjoysport下*.do的请求 -->
-		<url-pattern>/enjoysport/*</url-pattern>
+		<url-pattern>/enjoysport/*.do</url-pattern>
 	</servlet-mapping>
 	<!-- 使用SpringMVC配置逻辑 -->
 
