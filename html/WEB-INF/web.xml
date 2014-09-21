@@ -12,18 +12,18 @@
 		<servlet-name>EnjoySportFrontController</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>  
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:SpringExampleMVC.xml</param-value>  
-    </init-param>  
+        	<param-name>contextConfigLocation</param-name>
+        	<param-value>classpath:SpringMVCHelloWorld.xml</param-value>  
+    	</init-param>  
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>EnjoySportFrontController</servlet-name>
 		<!-- 至拦截enjoysport下*.do的请求 -->
-		<url-pattern>/enjoysport/*.do</url-pattern>
+		<url-pattern>/hello</url-pattern>
 	</servlet-mapping>
 	<!-- 使用SpringMVC配置逻辑 -->
-
+	
 	<!-- 欢迎界面 -->
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
