@@ -7,6 +7,6 @@
 <title>Hello World</title>
 </head>
 <body>
-	${message}
+	<div>你好</div>
 </body>
 </html>
