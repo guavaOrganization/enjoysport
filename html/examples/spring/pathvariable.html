@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pathvariable</title>
+<script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+</head>
+<body>
+	<div>
+		<span>Spring PathVariable学习</span>
+		<input type="button" value="PathVariable 学习" onclick="pathVariable_clickMe()">
+		<span id="pathvariableSpan"></span>
+	</div>
+	<div>
+		<span>Spring PathVariable 指定@PathVariable名字学习</span>
+		<input type="button" value="PathVariable_指定参数名称" onclick="specifyName()">
+		<span id="specifyNameSpan"></span>
+	</div>
+	
+	<div>
+		<span>Spring PathVariable 支持正则表达式</span>
+		<input type="button" value="正则表达式学习" onclick="regular()">
+		<span id="regularSpan"></span>
+	</div>
+	
+	<div style="display: none;">
+		<span>Spring PathVariable 多个@PathVariable</span>
+		<input type="button" value="多个@PathVariable" onclick="anyNumberOf()">
+		<span id="anyNumberOfSpan"></span>
+	</div>
+</body>
+<script type="text/javascript">
+	$.ajaxSetup({
+		type : 'GET'
+	});//设置全局 AJAX 默认选项。
+	
+	function regular(){
+		$.ajax({
+			url : '/guava/pathVariableExample/regularSupport/40-z.guava',
+			context : $("#regularSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html('狗蛋,regular方法返回404啦');
+				}
+			}
+		});
+	}
+	
+	function anyNumberOf(){
+		$.ajax({
+			url : '/guava/pathVariableExample/anyNumberOf/specifyName/like.guava',
+			context : $("#anyNumberOfSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html('狗蛋,anyNumberOf方法错误了，又是404呢');
+				}
+			}
+		});
+	}
+	
+	function specifyName(){
+		$.ajax({
+			url : '/guava/pathVariableExample/findOwner/specifyName/like.guava',
+			context : $("#specifyNameSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html('狗蛋,specifyName方法错误了，又是404呢');
+				}
+			}
+		});
+	}
+	
+	function pathVariable_clickMe(){
+		$.ajax({
+			url : '/guava/pathVariableExample/findOwner/123/like.guava',
+			context : $("#pathvariableSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html('狗蛋,pathVariable_clickMe方法错误了，又是404呢');
+				}
+			}
+		});
+	}
+</script>
+</html>
