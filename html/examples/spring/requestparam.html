@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>@RequestParam</title>
+<script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+</head>
+<body>
+	<div>
+		<span>RequestParam学习</span>
+	</div>
+	<div>
+		<input type="button" value="RequestParam第一发" onclick="theFirst()"/>
+		<span id="theFirstSpan"></span>
+	</div>
+	<div>
+		<input type="button" value="RequestParam第二发" onclick="theSecond()"/>
+		<span id="theSecondSpan"></span>
+	</div>
+</body>
+	<script type="text/javascript">
+		function theSecond(){
+			$.ajax({
+				type : 'GET',
+				url : '/guava/requestParamExample/notRequired',
+				context : $("#theSecondSpan"),
+				statusCode : {
+					404 : function(){
+						$(this).html("RequestParam第er发404啦...........");
+					}
+				}
+			});
+		}
+		
+		function theFirst(){
+			$.ajax({
+				type : 'GET',
+				url : '/guava/requestParamExample/setupForm?petId=22',
+				context : $("#theFirstSpan"),
+				statusCode : {
+					404 : function(){
+						$(this).html("RequestParam第一发404啦...........");
+					}
+				}
+			});
+		}
+	</script>
+</html>
