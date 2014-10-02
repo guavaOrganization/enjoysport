@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>@RequestBody</title>
+<script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+</head>
+<body>
+	<div>
+		<span>RequestBody学习</span>
+	</div>
+	<div>
+		<input type="button" value="RequestBody第一发" onclick="theFirst()"/>
+		<span id="theFirstSpan"></span>
+	</div>
+	<div>
+		<input type="button" value="RequestBody第er发" onclick="theSecond()"/>
+		<span id="theSecondSpan"></span>
+	</div>
+</body>
+	<script type="text/javascript">
+		function theSecond(){
+			$.ajax({
+				type : 'POST',
+				url : '/guava/requestBodyExample/handlePost',
+				contentType : 'application/json; charset=UTF-8',
+				cache : false,
+				data : {
+					name : 'chenjun',
+					age : 26
+				},
+				context : $("#theSecondSpan"),
+				statusCode : {
+					404 : function(){
+						$(this).html("RequestBody第er发404啦...........");
+					}
+				}
+			});
+		}
+		
+		function theFirst(){
+			$.ajax({
+				type : 'GET',
+				url : '/guava/requestBodyExample/handleGet',
+				contentType : 'application/json; charset=UTF-8',
+				cache : false,
+				data : {
+					x : 'zs'
+				},
+				context : $("#theFirstSpan"),
+				statusCode : {
+					404 : function(){
+						$(this).html("RequestBody第一发404啦...........");
+					}
+				}
+			});
+		}
+	</script>
+</html>
