@@ -34,7 +34,7 @@
 	<servlet-mapping>
 		<servlet-name>EnjoySportFrontController</servlet-name>
 		<!-- 只拦截*.guava的请求 -->
-		<url-pattern>*.guava</url-pattern>
+		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 	<!-- 使用SpringMVC配置逻辑 -->
 	

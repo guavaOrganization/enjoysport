@@ -19,8 +19,14 @@
 	<!-- 
 		开启Spring MVC 
 		会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter两个bean
+		
+		enable-matrix-variables : 启动矩阵变量，默认为false
 	-->
-	<mvc:annotation-driven/>
+	<mvc:annotation-driven enable-matrix-variables="true" />
 	<!--自动扫描注解组件 -->
 	<context:component-scan base-package="com" />
+	<!-- 处理静态资源,一个*只能映射一级子目录，两个*可以映射多级子目录 -->
+	<mvc:resources location="/commons/" mapping="/commons/**" />
+	<mvc:resources location="/examples/" mapping="/examples/**" />
+	<mvc:resources location="/business/" mapping="/business/**" />
 </beans>

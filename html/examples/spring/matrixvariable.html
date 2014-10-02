@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>@MatrixVariable</title>
+<script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+</head>
+<body>
+	<div>
+		<span>矩阵变量学习</span>
+	</div>
+	<div>
+		<input type="button" value="矩阵变量第一发" onclick="theFirst()"/>
+		<span id="theFirstSpan"></span>
+	</div>
+	
+	<div>
+		<input type="button" value="矩阵变量第二发" onclick="theSecond()"/>
+		<span id="theSecondSpan"></span>
+	</div>
+	
+	<div>
+		<input type="button" value="矩阵变量第三发" onclick="theThird()"/>
+		<span id="theThirdSpan"></span>
+	</div>
+	
+	<div>
+		<input type="button" value="矩阵变量第四发" onclick="theFourth()"/>
+		<span id="theFourthSpan"></span>
+	</div>
+</body>
+	<script type="text/javascript">
+	function theFourth(){
+		$.ajax({
+			type : 'GET',
+			url : '/guava/matrixVariableExample/mapMatrixVariable/chenjun;hobby=basketball,coding/zengdetian;hobby=luguan;hobby=chiji',
+			context : $("#theFourthSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html("矩阵变量第三发404啦...........")
+				}
+			}
+		});
+	}
+	
+	function theThird(){
+		$.ajax({
+			type : 'GET',
+			url : '/guava/matrixVariableExample/defaultMatrixVariable/chenjun',
+			context : $("#theThirdSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html("矩阵变量第三发404啦...........")
+				}
+			}
+		});
+	}
+	
+	function theSecond(){
+		$.ajax({
+			type : 'GET',
+			url : '/guava/matrixVariableExample/multiMatrixVariable/chenjun;hobby=coding/zengdetian;hobby=luguan',
+			context : $("#theSecondSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html("矩阵变量第二发404啦...........")
+				}
+			}
+		});
+	}
+	
+	function theFirst(){
+		$.ajax({
+			type : 'GET',
+			url : '/guava/matrixVariableExample/matrixVariable/chenjun;hobby=gongfu',
+			context : $("#theFirstSpan"),
+			statusCode : {
+				404 : function(){
+					$(this).html("矩阵变量第一发404啦...........")
+				}
+			}
+		});
+	}
+	</script>
+</html>
