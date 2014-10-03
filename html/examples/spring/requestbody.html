@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>@RequestBody</title>
 <script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../../commons/js/json2.js"></script>
 </head>
 <body>
 	<div>
@@ -19,16 +20,14 @@
 	</div>
 </body>
 	<script type="text/javascript">
+		var human = {name : '陈俊', age : 26};		
 		function theSecond(){
 			$.ajax({
 				type : 'POST',
 				url : '/guava/requestBodyExample/handlePost',
-				contentType : 'application/json; charset=UTF-8',
+				contentType : 'application/json1; charset=UTF-8',
 				cache : false,
-				data : {
-					name : 'chenjun',
-					age : 26
-				},
+				data : JSON.stringify(human),// 需要导入json2.js
 				context : $("#theSecondSpan"),
 				statusCode : {
 					404 : function(){

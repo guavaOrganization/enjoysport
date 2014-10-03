@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.example.javabeans.Human;
+
 @Controller
 @RequestMapping("/requestBodyExample")
 public class RequestBodyExampleController {
@@ -15,7 +17,7 @@ public class RequestBodyExampleController {
 	}
 	
 	@RequestMapping(value = "/handlePost", method = RequestMethod.POST)
-	public void handlePost(@RequestBody String body) {
+	public void handlePost(@RequestBody Human body) {
 		System.out.println(body);
 	}
 }

@@ -22,7 +22,24 @@
 		
 		enable-matrix-variables : 启动矩阵变量，默认为false
 	-->
-	<mvc:annotation-driven enable-matrix-variables="true" />
+	<mvc:annotation-driven enable-matrix-variables="true">
+		<mvc:message-converters>
+			<!-- 
+				默认注册了：
+				ByteArrayHttpMessageConverter,StringHttpMessageConverter,SourceHttpMessageConverter,XmlAwareFormHttpMessageConverter 
+				
+				注册Json消息转换器 
+				依赖：jackson-annotations-2.4.2.jar，jackson-core-2.4.2.jar、jackson-databind-2.4.2.jar
+			-->
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				 <property name="supportedMediaTypes">  
+                    <list>  
+                        <value>application/json; charset=UTF-8</value>  
+                    </list>  
+                </property> 
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
 	<!--自动扫描注解组件 -->
 	<context:component-scan base-package="com" />
 	<!-- 处理静态资源,一个*只能映射一级子目录，两个*可以映射多级子目录 -->
