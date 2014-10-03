@@ -14,11 +14,13 @@ import com.example.javabeans.Human;
 public class RequestHeaderExampleController {
 	@RequestMapping(value = "/handle", method = RequestMethod.POST)
 	public @ResponseBody Human handle(@RequestBody Human human,
-			@RequestHeader("Accept") String accept,
+			@RequestHeader("Accept") String[] accept,
 			@RequestHeader("Accept-Language") String acceptLang,
 			@RequestHeader("Accept-Encoding") String acceptEnc,
 			@RequestHeader("User-Agent") String userAgent) {
-		System.out.println("accept >>>> " + accept);
+		for (int i = 0; null != accept && i < accept.length; i++) {
+			System.out.println("accept >>>> " + accept[i]);
+		}
 		System.out.println("acceptLang >>>> " + acceptLang);
 		System.out.println("acceptEnc >>>> " + acceptEnc);
 		System.out.println("userAgent >>>> " + userAgent);
