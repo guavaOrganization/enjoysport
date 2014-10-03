@@ -3,6 +3,7 @@ package com.example.javabeans;
 public class Human {
 	private String name;
 	private int age;
+	private String hobby;
 
 	public String getName() {
 		return name;
@@ -20,8 +21,16 @@ public class Human {
 		this.age = age;
 	}
 
+	public String getHobby() {
+		return hobby;
+	}
+
+	public void setHobby(String hobby) {
+		this.hobby = hobby;
+	}
+
 	@Override
 	public String toString() {
-		return "Human [name=" + name + ", age=" + age + "]";
+		return "Human [name=" + name + ", age=" + age + ", hobby=" + hobby + "]";
 	}
 }

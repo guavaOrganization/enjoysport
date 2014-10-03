@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>@RequestBody</title>
+<script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../../commons/js/json2.js"></script>
+</head>
+<body>
+	<div>
+		<span>ResponseBody学习</span>
+	</div>
+	<div>
+		<input type="button" value="ResponseBody第一发" onclick="theFirst()"/>
+		<span id="theFirstSpan"></span>
+	</div>
+</body>
+	<script type="text/javascript">
+		var human = {name : '陈俊', age : 26};		
+		function theFirst(){
+			$.ajax({
+				type : 'POST',
+				url : '/guava/responseBodyExample/helloWorld',
+				contentType : 'application/json; charset=UTF-8',
+				dataType : 'json',
+				cache : false,
+				data : JSON.stringify(human),// 需要导入json2.js
+				context : $("#theFirstSpan"),
+				statusCode : {
+					404 : function(){
+						$(this).html("ResponseBody第yi发404啦...........");
+					}
+				},
+				success : function(data, textStatus, jqXHR){
+					alert(data.name + "--" + data.hobby);
+				} 
+			});
+		}
+	</script>
+</html>
