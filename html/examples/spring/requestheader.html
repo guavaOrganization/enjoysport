@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>@RequestHeader</title>
+<script type="text/javascript" src="../../commons/js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../../commons/js/json2.js"></script>
+</head>
+<body>
+	<div>
+		<span>@RequestHeader学习</span>
+	</div>
+	<div>
+		<input type="button" value="@RequestHeader第一发" onclick="theFirst()"/>
+		<span id="theFirstSpan"></span>
+	</div>
+</body>
+	<script type="text/javascript">
+		var human = {name : '陈俊', age : 26};		
+		function theFirst(){
+			$.ajax({
+				type : 'POST',
+				url : '/guava/requestHeaderExample/handle',
+				contentType : 'application/json; charset=UTF-8',
+				dataType : 'json',
+				cache : false,
+				data : JSON.stringify(human),// 需要导入json2.js
+				context : $("#theFirstSpan"),
+				statusCode : {
+					200 : function(){
+						$(this).html("@RequestHeader第yi发成功啦...........");
+					}
+				},
+				success : function(data, textStatus, jqXHR){
+					debugger;
+				} 
+			});
+		}
+	</script>
+</html>
