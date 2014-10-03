@@ -1,4 +1,4 @@
-package com.example.controller;
+package com.example.spring.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import com.example.javabeans.Pet;
+import com.example.spring.javabeans.Pet;
 
 @Controller
 @RequestMapping(value = "/modelAttributeExample")

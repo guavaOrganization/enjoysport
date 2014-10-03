@@ -1,4 +1,4 @@
-package com.example.javabeans;
+package com.example.spring.javabeans;
 
 public class Pet {
 	private int petId;

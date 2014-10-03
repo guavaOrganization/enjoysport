@@ -1,9 +1,8 @@
-package com.example.javabeans;
+package com.example.spring.javabeans;
 
-public class Human {
+public class BindParamBean {
 	private String name;
 	private int age;
-	private String hobby;
 
 	public String getName() {
 		return name;
@@ -21,16 +20,8 @@ public class Human {
 		this.age = age;
 	}
 
-	public String getHobby() {
-		return hobby;
-	}
-
-	public void setHobby(String hobby) {
-		this.hobby = hobby;
-	}
-
 	@Override
 	public String toString() {
-		return "Human [name=" + name + ", age=" + age + ", hobby=" + hobby + "]";
+		return "BindParamBean [name=" + name + ", age=" + age + "]";
 	}
 }

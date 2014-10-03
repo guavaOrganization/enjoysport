@@ -1,11 +1,11 @@
-package com.example.controller;
+package com.example.spring.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.example.javabeans.Human;
+import com.example.spring.javabeans.Human;
 
 @Controller
 @RequestMapping("/requestBodyExample")
