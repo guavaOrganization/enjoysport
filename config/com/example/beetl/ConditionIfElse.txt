@@ -1,0 +1,12 @@
+<%
+	var a = true;
+	var b = 1;
+	
+	if(a && b ==1){
+		println('今天是个好日子');
+	}else if(true){
+		println('明天也是个好日子');
+	}else{
+		println('天天都是好日子');
+	}
+%>

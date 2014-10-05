@@ -1,0 +1,7 @@
+<%
+	for(entry in map){
+		var key = entry.key;
+		var value = entry.value;
+		println(key + "~~" + value);
+	}
+%>

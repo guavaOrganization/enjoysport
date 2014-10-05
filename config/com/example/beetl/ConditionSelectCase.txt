@@ -1,0 +1,12 @@
+<%
+	//select-case是switch case的增强版。他允许case里有逻辑表达式，同时，也不需要每个case都break一下，默认遇到合乎条件的case执行后就退出。
+	var b = 1;
+	select(1){
+		case 0,1 : 
+			println("it's small int");
+		case 2,3 : 
+			println("it's big int");
+		default : 
+			println("error");
+	}
+%>

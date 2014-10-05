@@ -1,0 +1,18 @@
+<%
+	// Beetl支持类似Javascript,java的条件表达式 如>， <，== ，!=，>=,  <= 以及!, 还有&&和||
+	var a = 1;
+	var b = "good";
+	var c = null;
+	
+	if(a == 1 && b == "good" && c == null){
+%>
+	陈俊
+<%
+	} else {
+%>
+	吴丽
+<%
+	}
+%>
+
+${a == 1 ? "ok" : "no"}
