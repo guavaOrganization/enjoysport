@@ -1,0 +1,8 @@
+${@com.example.beetl.utils.BeetlUtil.example(user.name)}
+<%
+ /**
+  *@type(User user)
+  */
+%>
+${@user.setName('吴丽')}
+${user.name}
