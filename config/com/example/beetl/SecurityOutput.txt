@@ -1,0 +1,66 @@
+\${user!} 的安全输出结果是${user!}
+<%
+// 可以在!后增加一个常量（字符串，数字类型等），或者另外一个变量，方法，本地调用，作为默认输出
+%>
+\${user! '陈俊'} 的安全输出结果是${user! '陈俊'}
+<%
+	// 在变量后加上!不仅仅可以应用于占位符输出(但主要是应用于占位符输出)，也可以用于表达式中
+	var k = user.name! + 'N/A' + user.age!;
+%>
+    ${k}
+    
+<%
+	//在有些模板里，可能整个模板都需要安全输出，也可能模板的部分需要安全输出，使用者不必为每一个表达式使用！，可以使用beetl的安全指示符号来完成安全输出
+	// 打开安全输出
+	DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+	${user.name}
+<%
+	// 关闭安全输出。
+	DIRECTIVE SAFE_OUTPUT_CLOSE;
+	
+	// Beetl不建议每一个页面都使用DIRECTIVE  SAFE_OUTPUT_OPEN，这样，如果如果真有不期望的错误，不容易及时发现.
+	// 其次，安全输出意味着beetl会有额外的代码检测值是否存在或者是否为null，性能会略差点。所以建议及时关闭安全输出
+%>
+
+<%
+	var list = null;
+	// 在for-in  循环中  ，也可以为集合变量增加安全输出指示符号，这样，如果集合变量为null，也可以不进入循环体
+	for(item in list!){
+		println("has data");
+	}elsefor{
+		println("no data");
+	}
+%>
+<%
+	// 变量是否存在
+	// 判断变量是否存在，可以采用内置的has或者isEmpty方法来判断，参数是变量
+	if(has(flag)){
+		println("has flag");
+	}else{
+		println("no exit");
+	}
+%>
+<%
+	// 如果需要判断变量是否存在，如果存在，还有其他判断条件，通常都这么写
+	var flag = 0;
+	if(has(flag) || flag == 0){
+		println("flag is 0");
+	}
+	
+	// 如果flag不存在，或者flag存在，但值是0，都将执行if语句。但是，有更为简便的方法是直接用安全输出
+	// flag!0 取值是这样的，如果flag不存在，则为0，如果存在，则取值flag的值，类似三元表达式has(flag)?falg:0
+	if(flag!0 == 0){
+		println("flag continue is 0");
+	}
+	
+	// 安全输出表达式~~总结
+	// 安全输出表达式可以包括
+	// 字符串常量,如 ${user.count!"无结果"}
+	// boolean常量${user.count!false}
+	// 数字常量，仅限于正数，因为如果是负数，则类似减号，容易误用，因此，如果需要表示负数，请用括号，如${user.count!(-1)}
+	// class直接调用，如${user.count!@User.DEFAULT_NUM}
+	// 方法调用，如${user.count!getDefault() }
+	// 属性引用，如${user.count!user.maxCount }
+	// 任何表达式，需要用括号
+%>

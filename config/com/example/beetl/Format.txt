@@ -1,0 +1,9 @@
+<%
+	// 格式化
+	// 几乎所有的模板语言都支持格式化，Beetl也不列外，如下例子Beetl提供的内置日期格式
+	var date = date();
+	
+	// Beetl针对日期好数字类型提供的默认的格式化函数，在org/beetl/core/beetl-default.properties里，注册了相关属性
+%>
+today is ${date,dateFormat="yyyy-MM-dd"}
+today is ${date}
