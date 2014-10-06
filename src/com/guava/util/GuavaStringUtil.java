@@ -1,5 +1,5 @@
 package com.guava.util;
 
-public class StringUtil {
+public class GuavaStringUtil {
 
 }
