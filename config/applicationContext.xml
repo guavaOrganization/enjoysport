@@ -40,8 +40,39 @@
 			</bean>
 		</mvc:message-converters>
 	</mvc:annotation-driven>
+	
 	<!--自动扫描注解组件 -->
 	<context:component-scan base-package="com" />
+
+	<!-- Beetl视图技术 -->
+	<bean id="beetlConfig" class="org.beetl.ext.spring.BeetlGroupUtilConfiguration" init-method="init"></bean>
+	<bean id="viewResolver" class="org.beetl.ext.spring.BeetlSpringViewResolver">
+		<property name="viewNames">
+			<list>
+				<value>beetl/**</value>
+			</list>
+		</property>
+		<property name="order" value="0"/>
+		<property name="prefix" value="/examples/"/>
+		<property name="suffix" value=".btl"/>
+		<property name="contentType" value="text/html;charset=UTF-8" />
+	</bean>
+	<!-- Beetl视图技术 -->
+	<!-- JSP视图解析器 -->
+	<bean name="JSPViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 注意JSP的这个视图解析器order必须在最后 -->
+		<property name="viewNames">
+			<list>
+				<value>jsp/**</value>
+			</list>
+		</property>
+		<property name="order" value="256"/>
+		<property name="prefix" value="/examples/"/>
+		<property name="suffix" value=".jsp"/>
+		<property name="contentType" value="text/html;charset=UTF-8"/>
+	</bean>
+	<!-- JSP视图解析器 -->
+	
 	<!-- 处理静态资源,一个*只能映射一级子目录，两个*可以映射多级子目录 -->
 	<mvc:resources location="/commons/" mapping="/commons/**" />
 	<mvc:resources location="/examples/" mapping="/examples/**" />
