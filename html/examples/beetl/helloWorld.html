@@ -4,7 +4,16 @@
 <meta charset="UTF-8">
 <title>${title}</title>
 </head>
-<body>
+<body onload="init()">
 	<h1>${name}</h1>
+	<%guavaTestTag("/examples/beetl/GuavaTestTag.btl",{title:'标签测试',author:'陈俊'}){%>
+		这个部分的值可以通过Tag.getBodyContent()方法获取
+	<%}%>
 </body>
+<script type="text/javascript">
+	var name = "${name}";
+	function init(){
+		alert("欢迎使用~~" + name);
+	}
+</script>
 </html>
