@@ -2,8 +2,6 @@ package com.example.beetl.tags;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.beetl.core.BodyContent;
 import org.beetl.core.Tag;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class BeetlExampleController {
 	@RequestMapping(value = "/helloWorld")
 	public String helloWorld(Model model) {
-		model.addAttribute("name", "陈俊");
+		model.addAttribute("name", "吴小丽");
 		model.addAttribute("title", "Beetl Spring 融合");
 		return "beetl/helloWorld";
 	}
