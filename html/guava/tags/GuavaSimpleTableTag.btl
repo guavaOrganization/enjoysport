@@ -1,18 +1,18 @@
-<table id="${table_id}">
-	<tr>
-		<td>
-			姓名
-		</td>
-		<td>
-			年龄
-		</td>
-	</tr>
-	<tr>
-		<td>
-			${name}
-		</td>
-		<td>
-			26
-		</td>
-	</tr>
+<table id="${tableId}">
+  <thead>
+    <tr>
+    <%for(tableTitleMap in colList!){%>
+      <td>${tableTitleMap['ColTitle']}</td>
+    <%}%>
+    </tr>
+  </thead>
+  <tbody>
+  	<%for(tableColDataMap in dataList!){%>
+    <tr>
+	<%for(colMap in colList!){%>
+    <td>${tableColDataMap[${colMap['Col']}]}</td>
+    <%}%>
+    </tr>
+  	<%}%>
+  </tbody>
 </table>

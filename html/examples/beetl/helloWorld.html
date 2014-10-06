@@ -5,8 +5,14 @@
 <title>${title}</title>
 </head>
 <body onload="init()">
-	<h1>${name}</h1>
-	<%GuavaSimpleTableTag({table_id:'myFirstTable'}){%><%}%>
+  <h1>欢迎使用，${name}女士</h1>
+  <%GuavaSimpleTableTag(
+     {tableId:'myFirstTable'},
+    [{Col:'Name',ColTitle:'姓名'},
+     {Col:'Age',ColTitle:'芳龄'}
+    ])
+  {%>
+  <%}%>
 </body>
 <script type="text/javascript">
 	var name = "${name}";

@@ -1,6 +1,9 @@
 package com.guava.beetl.tags;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.beetl.core.Tag;
@@ -10,7 +13,7 @@ import org.beetl.core.misc.BeetlUtil;
 public class GuavaSimpleTableTag extends Tag {
 	private static final String LAYOUT_FILE = "/guava/tags/GuavaSimpleTableTag.btl";
 	public void render() {
-		if (null == this.args || this.args.length != 1) {
+		if (null == this.args || this.args.length != 2) {
 			throw new RuntimeException("参数错误");
 		}
 		String layoutFile = BeetlUtil.getRelPath(this.ctx.getResourceId(), LAYOUT_FILE);
@@ -23,6 +26,21 @@ public class GuavaSimpleTableTag extends Tag {
 			String key = keys.next();
 			t.binding(key, map.get(key));
 		}
+		List<Map> colList = (List<Map>) this.args[1];
+		List<Map> dataList = new ArrayList<Map>();
+		
+		Map<String, String> dataMap = new HashMap<String, String>();
+		dataMap.put("Name", "陈小俊");
+		dataMap.put("Age", "26");
+		dataList.add(dataMap);
+		
+		dataMap = new HashMap<String, String>();
+		dataMap.put("Name", "吴小丽");
+		dataMap.put("Age", "25");
+		dataList.add(dataMap);
+
+		t.binding("dataList", dataList);
+		t.binding("colList", colList);
 		t.renderTo(this.ctx.byteWriter);
 	}
 }
