@@ -54,7 +54,7 @@
 		</property>
 		<property name="order" value="0"/>
 		<property name="prefix" value="/examples/"/>
-		<property name="suffix" value=".btl"/>
+		<property name="suffix" value=".html"/>
 		<property name="contentType" value="text/html;charset=UTF-8" />
 	</bean>
 	<!-- Beetl视图技术 -->
