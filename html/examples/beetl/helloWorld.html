@@ -6,13 +6,9 @@
 </head>
 <body onload="init()">
   <h1>欢迎使用，${name}女士</h1>
-  <%GuavaSimpleTableTag(
-     {tableId:'myFirstTable'},
-    [{Col:'Name',ColTitle:'姓名'},
-     {Col:'Age',ColTitle:'芳龄'}
-    ])
-  {%>
-  <%}%>
+  <%GuavaSimpleTableTag({tableId:'myFirstTable'}, 
+   [{Col:'Name',ColTitle:'姓名'}, {Col:'Age',ColTitle:'芳龄'}, {Col:'Province',ColTitle:'省市'}])
+  {}%>
 </body>
 <script type="text/javascript">
 	var name = "${name}";

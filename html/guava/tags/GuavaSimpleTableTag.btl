@@ -10,7 +10,7 @@
   	<%for(tableColDataMap in dataList!){%>
     <tr>
 	<%for(colMap in colList!){%>
-    <td>${tableColDataMap[${colMap['Col']}]}</td>
+    <td>${tableColDataMap[colMap['Col']]}</td>
     <%}%>
     </tr>
   	<%}%>

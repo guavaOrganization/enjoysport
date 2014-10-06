@@ -32,11 +32,13 @@ public class GuavaSimpleTableTag extends Tag {
 		Map<String, String> dataMap = new HashMap<String, String>();
 		dataMap.put("Name", "陈小俊");
 		dataMap.put("Age", "26");
+		dataMap.put("Province", "江西省");
 		dataList.add(dataMap);
 		
 		dataMap = new HashMap<String, String>();
 		dataMap.put("Name", "吴小丽");
 		dataMap.put("Age", "25");
+		dataMap.put("Province", "四川省");
 		dataList.add(dataMap);
 
 		t.binding("dataList", dataList);
