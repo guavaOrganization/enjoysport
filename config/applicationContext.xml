@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>    
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	xmlns="http://www.springframework.org/schema/beans" : 指出默认的命名空间为 http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" : 可用的 XML Schema 实例命名空间，可以使用 schemaLocation 属性了。
+															此属性有两个值。第一个值是需要使用的命名空间。第二个值是供命名空间使用的 XML schema 的位置   
+-->
 <beans xmlns="http://www.springframework.org/schema/beans"    
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
     xmlns:p="http://www.springframework.org/schema/p"  
@@ -16,10 +21,60 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	<!-- %%%%Spring JDBC%%%% start -->
+	<!-- %数据库连接配置% start -->
+	<context:property-placeholder location="classpath:db.properties" />
+  	<!-- %数据库连接配置% end -->
+  	
+  	<!-- %数据源/数据库连接池c3p0配置% start -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${db.driverClassName}"></property>
+		<property name="jdbcUrl" value="${db.url}"></property>
+		<property name="user" value="${db.username}"></property>
+		<property name="password" value="${db.password}"></property>
+		<property name="maxPoolSize" value="20"></property>
+		<property name="minPoolSize" value="5"></property>
+		<property name="initialPoolSize" value="5"></property>
+		<property name="maxIdleTime" value="20"></property>
+	</bean>
+	<!-- %数据源/数据库连接池c3p0配置% end -->
+	
+	<!-- %配置事务管理器% id如果省略，则默认为"transactionManager", start -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<!-- %配置事务管理器% end -->
+	
+	<!-- %配置事务通知属性% start -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- %CRUD操作事务属性% start -->
+			<tx:method name="create*" propagation="REQUIRED"/>
+			<tx:method name="retrieve*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<!-- %CRUD操作事务属性% end -->
+		</tx:attributes>
+	</tx:advice>
+	<!-- %配置事务通知属性% end -->
+	
+	<!-- %基于AOP的声明式事务配置% start -->
+	<aop:config>
+		<aop:pointcut id="serviceOperation" expression="execution(* com..*.service..*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation" />
+		<!-- 
+		<aop:aspect id="transactionAspect" ref="transactionAspectBean">
+			<aop:before pointcut-ref="serviceOperation" method="doTransactionBefore" />
+			<aop:after-throwing pointcut-ref="serviceOperation" method="doTransactionThrowing" throwing="ex" />
+		</aop:aspect>
+		 -->
+	</aop:config>
+	<!-- %基于AOP的声明式事务配置% end -->
+	<!-- %%%%Spring JDBC%%%% end -->
+	
 	<!-- 
 		开启Spring MVC 
 		会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter两个bean
-		
 		enable-matrix-variables : 启动矩阵变量，默认为false
 	-->
 	<mvc:annotation-driven enable-matrix-variables="true">
@@ -40,7 +95,7 @@
 			</bean>
 		</mvc:message-converters>
 	</mvc:annotation-driven>
-	
+
 	<!--自动扫描注解组件 -->
 	<context:component-scan base-package="com" />
 
