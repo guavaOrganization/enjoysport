@@ -5,4 +5,7 @@ public interface IDeclarativeTransactionManagementService {
 	
 	public void createDeclarativeTransactionManagementBaseProxy() throws Exception;
 
+	public int countTestBitTotal() throws Exception;
+	
+	public void createUser() throws Exception;
 }

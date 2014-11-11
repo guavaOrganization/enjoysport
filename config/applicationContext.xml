@@ -45,6 +45,7 @@
 	</bean>
 	<!-- %配置事务管理器% end -->
 	
+	<!-- %基于AOP的声明式事务配置% start -->
 	<!-- %配置事务通知属性% start -->
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -52,13 +53,11 @@
 			<tx:method name="create*" propagation="REQUIRED"/>
 			<tx:method name="retrieve*" propagation="REQUIRED" read-only="true" />
 			<tx:method name="update*" propagation="REQUIRED" />
-			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" isolation="DEFAULT" read-only="false" />
 			<!-- %CRUD操作事务属性% end -->
 		</tx:attributes>
 	</tx:advice>
 	<!-- %配置事务通知属性% end -->
-	
-	<!-- %基于AOP的声明式事务配置% start -->
 	<aop:config>
 		<aop:pointcut id="serviceOperation" expression="execution(* com..*.service..*ServiceImpl.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation" />
@@ -70,7 +69,13 @@
 		 -->
 	</aop:config>
 	<!-- %基于AOP的声明式事务配置% end -->
+	<!-- %基于注解形式的声明式事务配置% start -->
+	<!-- 
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	 -->
+	<!-- %基于注解形式的声明式事务配置% end -->
 	<!-- %%%%Spring JDBC%%%% end -->
+	
 	
 	<!-- 
 		开启Spring MVC 

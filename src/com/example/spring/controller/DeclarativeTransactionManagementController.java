@@ -15,15 +15,27 @@ public class DeclarativeTransactionManagementController {
 	private IDeclarativeTransactionManagementService declarativeTransactionManagementService;
 
 	@RequestMapping(value = "/analyzeProxy")
-	public String analyzeDeclarativeTransactionManagementBaseProxy() throws Exception{
+	public String analyzeDeclarativeTransactionManagementBaseProxy() throws Exception {
 		declarativeTransactionManagementService.analyzeDeclarativeTransactionManagementBaseProxy();
 		return "success";
 	}
-	
+
 	@RequestMapping(value = "/createProxy")
-	public String createDeclarativeTransactionManagementBaseProxy() throws Exception{
+	public String createDeclarativeTransactionManagementBaseProxy() throws Exception {
 		declarativeTransactionManagementService.createDeclarativeTransactionManagementBaseProxy();
 		return "success";
 
+	}
+	
+	@RequestMapping(value = "/countTestBitTotal")
+	public String countTestBitTotal() throws Exception {
+		declarativeTransactionManagementService.countTestBitTotal();
+		return "success";
+	}
+	
+	@RequestMapping(value = "/createUser")
+	public String createUser() throws Exception {
+		declarativeTransactionManagementService.createUser();
+		return "success";
 	}
 }
