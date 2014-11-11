@@ -38,4 +38,52 @@ public class DeclarativeTransactionManagementController {
 		declarativeTransactionManagementService.createUser();
 		return "success";
 	}
+	
+	@RequestMapping(value = "/retrieveUserNameById")
+	public String retrieveUserNameById() throws Exception {
+		declarativeTransactionManagementService.retrieveUserNameById(1);
+		return "success";
+	}
+
+	@RequestMapping(value = "/retrieveUserById")
+	public String retrieveUserById() throws Exception {
+		declarativeTransactionManagementService.retrieveUserById(2);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/retrieveAllUser")
+	public String retrieveAllUser() throws Exception {
+		declarativeTransactionManagementService.retrieveAllUser();
+		return "success";
+	}
+	
+	@RequestMapping(value = "/updateUser")
+	public String updateUser() throws Exception {
+		declarativeTransactionManagementService.updateUser(3, "忍者神龟");
+		return "success";
+	}
+	
+	@RequestMapping(value = "/deleteUserById")
+	public String deleteUserById() throws Exception {
+		declarativeTransactionManagementService.deleteUserById(3);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/retrieveUserNameByIdWithNamedParameterJdbcTemplate")
+	public String retrieveUserNameByIdWithNamedParameterJdbcTemplate() throws Exception {
+		declarativeTransactionManagementService.retrieveUserNameByIdWithNamedParameterJdbcTemplate(1);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/retrieveUserNameByIdWithMap")
+	public String retrieveUserNameByIdWithMap() throws Exception {
+		declarativeTransactionManagementService.retrieveUserNameByIdWithMap(2);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/retrieveUserNameByIdWithBeanProperty")
+	public String retrieveUserNameByIdWithBeanProperty() throws Exception {
+		declarativeTransactionManagementService.retrieveUserNameByIdWithBeanProperty(1);
+		return "success";
+	}
 }
