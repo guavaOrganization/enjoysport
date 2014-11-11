@@ -1,10 +1,14 @@
 package com.example.spring.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.spring.javabeans.TestBitUser;
 import com.example.spring.service.interfaces.IDeclarativeTransactionManagementService;
 
 @Controller
@@ -39,21 +43,21 @@ public class DeclarativeTransactionManagementController {
 		return "success";
 	}
 	
-	@RequestMapping(value = "/retrieveUserNameById")
-	public String retrieveUserNameById() throws Exception {
-		declarativeTransactionManagementService.retrieveUserNameById(1);
+	@RequestMapping(value = "/readUserNameById")
+	public String readUserNameById() throws Exception {
+		declarativeTransactionManagementService.readUserNameById(1);
 		return "success";
 	}
 
-	@RequestMapping(value = "/retrieveUserById")
-	public String retrieveUserById() throws Exception {
-		declarativeTransactionManagementService.retrieveUserById(2);
+	@RequestMapping(value = "/readUserById")
+	public String readUserById() throws Exception {
+		declarativeTransactionManagementService.readUserById(2);
 		return "success";
 	}
 	
-	@RequestMapping(value = "/retrieveAllUser")
-	public String retrieveAllUser() throws Exception {
-		declarativeTransactionManagementService.retrieveAllUser();
+	@RequestMapping(value = "/readAllUser")
+	public String readAllUser() throws Exception {
+		declarativeTransactionManagementService.readAllUser();
 		return "success";
 	}
 	
@@ -69,21 +73,53 @@ public class DeclarativeTransactionManagementController {
 		return "success";
 	}
 	
-	@RequestMapping(value = "/retrieveUserNameByIdWithNamedParameterJdbcTemplate")
-	public String retrieveUserNameByIdWithNamedParameterJdbcTemplate() throws Exception {
-		declarativeTransactionManagementService.retrieveUserNameByIdWithNamedParameterJdbcTemplate(1);
+	@RequestMapping(value = "/readUserNameByIdWithNamedParameterJdbcTemplate")
+	public String readUserNameByIdWithNamedParameterJdbcTemplate() throws Exception {
+		declarativeTransactionManagementService.readUserNameByIdWithNamedParameterJdbcTemplate(1);
 		return "success";
 	}
 	
-	@RequestMapping(value = "/retrieveUserNameByIdWithMap")
-	public String retrieveUserNameByIdWithMap() throws Exception {
-		declarativeTransactionManagementService.retrieveUserNameByIdWithMap(2);
+	@RequestMapping(value = "/readUserNameByIdWithMap")
+	public String readUserNameByIdWithMap() throws Exception {
+		declarativeTransactionManagementService.readUserNameByIdWithMap(2);
 		return "success";
 	}
 	
-	@RequestMapping(value = "/retrieveUserNameByIdWithBeanProperty")
-	public String retrieveUserNameByIdWithBeanProperty() throws Exception {
-		declarativeTransactionManagementService.retrieveUserNameByIdWithBeanProperty(1);
+	@RequestMapping(value = "/readUserNameByIdWithBeanProperty")
+	public String readUserNameByIdWithBeanProperty() throws Exception {
+		declarativeTransactionManagementService.readUserNameByIdWithBeanProperty(1);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/updateUserByBatch")
+	public String updateUserByBatch() throws Exception {
+		TestBitUser bitUser = new TestBitUser();
+		bitUser.setId(1);
+		bitUser.setName("八两俊");
+		
+		TestBitUser user = new TestBitUser();
+		user.setId(2);
+		user.setName("猪古丽");
+		List<TestBitUser> list = new ArrayList<TestBitUser>();
+		list.add(bitUser);
+		list.add(user);
+		declarativeTransactionManagementService.updateUser(list);
+		return "success";
+	}
+	
+	@RequestMapping(value = "/updateUserByBatchWithNamedParameterJdbcTemplate")
+	public String updateUserByBatchWithNamedParameterJdbcTemplate() throws Exception {
+		TestBitUser bitUser = new TestBitUser();
+		bitUser.setId(1);
+		bitUser.setName("陈俊");
+		
+		TestBitUser user = new TestBitUser();
+		user.setId(2);
+		user.setName("吴丽");
+		List<TestBitUser> list = new ArrayList<TestBitUser>();
+		list.add(bitUser);
+		list.add(user);
+		declarativeTransactionManagementService.updateUserWithNamedParameterJdbcTemplate(list);
 		return "success";
 	}
 }

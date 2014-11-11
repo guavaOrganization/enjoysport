@@ -51,7 +51,7 @@
 		<tx:attributes>
 			<!-- %CRUD操作事务属性% start -->
 			<tx:method name="create*" propagation="REQUIRED"/>
-			<tx:method name="retrieve*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="read*" propagation="REQUIRED" read-only="true" />
 			<tx:method name="update*" propagation="REQUIRED" />
 			<tx:method name="delete*" propagation="REQUIRED" isolation="DEFAULT" read-only="false" />
 			<!-- %CRUD操作事务属性% end -->

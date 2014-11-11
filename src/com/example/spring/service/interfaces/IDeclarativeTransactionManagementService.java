@@ -17,15 +17,19 @@ public interface IDeclarativeTransactionManagementService {
 	
 	public void deleteUserById(int id) throws Exception;
 
-	public String retrieveUserNameById(int id) throws Exception;
+	public String readUserNameById(int id) throws Exception;
 	
-	public String retrieveUserNameByIdWithNamedParameterJdbcTemplate(int id) throws Exception;
+	public String readUserNameByIdWithNamedParameterJdbcTemplate(int id) throws Exception;
 	
-	public String retrieveUserNameByIdWithMap(int id) throws Exception;
+	public String readUserNameByIdWithMap(int id) throws Exception;
 	
-	public String retrieveUserNameByIdWithBeanProperty(int id) throws Exception;
+	public String readUserNameByIdWithBeanProperty(int id) throws Exception;
 
-	public TestBitUser retrieveUserById(int id) throws Exception;
+	public TestBitUser readUserById(int id) throws Exception;
 	
-	public List<TestBitUser> retrieveAllUser() throws Exception;
+	public List<TestBitUser> readAllUser() throws Exception;
+	
+	public int[] updateUser(List<TestBitUser> bitUsers) throws Exception;
+	
+	public int[] updateUserWithNamedParameterJdbcTemplate(List<TestBitUser> bitUsers) throws Exception;
 }

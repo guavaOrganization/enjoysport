@@ -45,44 +45,54 @@ public class DeclarativeTransactionManagementServiceImpl implements IDeclarative
 		testBitDAO.deleteUserById(id);
 	}
 	
-	public String retrieveUserNameById(int id) throws Exception{
+	public String readUserNameById(int id) throws Exception{
 		String name = testBitDAO.getUserNameById(id);
-		log.info("Retrieve User Is Success,User Id is" + id + " And Name is " + name);
+		log.info("read User Is Success,User Id is" + id + " And Name is " + name);
 		return name;
 	}
 	
-	public String retrieveUserNameByIdWithNamedParameterJdbcTemplate(int id) throws Exception{
+	public String readUserNameByIdWithNamedParameterJdbcTemplate(int id) throws Exception{
 		String name = testBitDAO.getUserNameByIdWithNamedParameterJdbcTemplate(id);
-		log.info("Retrieve User Is Success,User Id is" + id + " And Name is " + name);
+		log.info("read User Is Success,User Id is" + id + " And Name is " + name);
 		return name;
 	}
 	
-	public String retrieveUserNameByIdWithMap(int id) throws Exception{
+	public String readUserNameByIdWithMap(int id) throws Exception{
 		String name = testBitDAO.getUserNameByIdWithMap(id);
-		log.info("Retrieve User Is Success,User Id is" + id + " And Name is " + name);
+		log.info("read User Is Success,User Id is" + id + " And Name is " + name);
 		return name;
 	}
 	
-	public String retrieveUserNameByIdWithBeanProperty(int id) throws Exception{
+	public String readUserNameByIdWithBeanProperty(int id) throws Exception{
 		TestBitUser bitUser = new TestBitUser();
 		bitUser.setId(id);
 		String name = testBitDAO.getUserNameByIdWithBeanProperty(bitUser);
-		log.info("retrieveUserNameByIdWithBeanProperty >>>> Retrieve User Is Success,User Id is" + id + " And Name is " + name);
+		log.info("readUserNameByIdWithBeanProperty >>>> read User Is Success,User Id is" + id + " And Name is " + name);
 		return name;
 		
 	}
-	public TestBitUser retrieveUserById(int id) throws Exception {
+	public TestBitUser readUserById(int id) throws Exception {
 		TestBitUser user = testBitDAO.getUserById(id);
-		log.info("Retrieve User Is Success,User info : " + user);
+		log.info("read User Is Success,User info : " + user);
 		return user;
 	}
 
-	public List<TestBitUser> retrieveAllUser() throws Exception {
+	public List<TestBitUser> readAllUser() throws Exception {
 		List<TestBitUser> bitUsers = testBitDAO.getAllUser();
 		log.info("Total User Number is " + bitUsers == null ? 0 : bitUsers.size());
 		for (int i = 0; null != bitUsers && i < bitUsers.size(); i++) {
 			log.info("User Info : " + bitUsers.get(i));
 		}
 		return bitUsers;
+	}
+	
+	public int[] updateUser(List<TestBitUser> bitUsers) throws Exception{
+		int[] results = testBitDAO.batchUpdateUser(bitUsers);
+		return results;
+	}
+	
+	public int[] updateUserWithNamedParameterJdbcTemplate(List<TestBitUser> bitUsers) throws Exception{
+		int[] results = testBitDAO.batchUpdateUserWithNamedParameterJdbcTemplate(bitUsers);
+		return results;
 	}
 }
