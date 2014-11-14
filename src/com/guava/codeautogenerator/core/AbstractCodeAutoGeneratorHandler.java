@@ -54,7 +54,6 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 		long startTime = System.currentTimeMillis();
 		if(log.isInfoEnabled())
 			log.info("Welcome Use Code Auto Generator Tool...");
-		initParameterHolder(parameterHolder);// 初始化ParameterHolder
 		preprocessingAutoGeneratorCode(parameterHolder); // TODO Step1 : 前置处理
 		handleAutoGeneratorCodeInternal(parameterHolder);// TODO Step2 : 自动生成代码逻辑
 		postprocessingAutoGeneratorCode(parameterHolder); // TODO Step3 : 后置处理
@@ -64,16 +63,21 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 			log.info("The time-consuming is >>>> " + (System.currentTimeMillis() - startTime));
 	}
 	
-	private void initParameterHolder(ParameterHolder parameterHolder) {
-		parameterHolder.setTemplateEngine(this.templateEngine);
-		parameterHolder.setCodeStyle(this.codeStyle);
-		parameterHolder.setCodeModuleName(this.codeModuleName);
-		parameterHolder.setCodeAutoGeneratorMappings(this.codeAutoGeneratorMappings);
-	}
-	
 	private void preprocessingAutoGeneratorCode(ParameterHolder parameterHolder) throws CodeAutoGeneratorException{// 前置处理
 		preprocessingAutoGeneratorCodeInternal(parameterHolder);
+		initParameterHolder(parameterHolder);// 初始化ParameterHolder
 		checkParameterHolder(parameterHolder);
+	}
+	
+	private void initParameterHolder(ParameterHolder parameterHolder) {
+		if (null == parameterHolder.getTemplateEngine() || !(parameterHolder.getTemplateEngine() instanceof TemplateEngine)) {
+			parameterHolder.setTemplateEngine(this.templateEngine);
+		}
+		if(null == parameterHolder.getCodeStyle())
+			parameterHolder.setCodeStyle(this.codeStyle);
+		if (null == parameterHolder.getCodeModuleName())
+			parameterHolder.setCodeModuleName(this.codeModuleName);
+		parameterHolder.setCodeAutoGeneratorMappings(this.codeAutoGeneratorMappings);
 	}
 	
 	private void checkParameterHolder(ParameterHolder parameterHolder) throws CodeAutoGeneratorException {
