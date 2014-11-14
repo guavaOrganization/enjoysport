@@ -122,4 +122,11 @@ public class DeclarativeTransactionManagementController {
 		declarativeTransactionManagementService.updateUserWithNamedParameterJdbcTemplate(list);
 		return "success";
 	}
+	
+	
+	@RequestMapping(value = "/createUserWithSimpleJdbcInsert")
+	public String createUserWithSimpleJdbcInsert() throws Exception {
+		declarativeTransactionManagementService.createUserWithSimpleJdbcInsert();
+		return "success";
+	}
 }

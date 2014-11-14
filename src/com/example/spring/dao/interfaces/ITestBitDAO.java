@@ -7,6 +7,8 @@ import org.springframework.dao.DataAccessException;
 import com.example.spring.javabeans.TestBitUser;
 
 public interface ITestBitDAO {
+	public void insertUserWithSimpleJdbcInsert(TestBitUser bitUser) throws DataAccessException;
+		
 	public int countTestBitTotal() throws DataAccessException;
 	
 	public void insertToUser(int id, String name) throws DataAccessException;

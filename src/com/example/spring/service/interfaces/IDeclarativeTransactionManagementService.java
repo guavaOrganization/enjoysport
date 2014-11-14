@@ -5,6 +5,8 @@ import java.util.List;
 import com.example.spring.javabeans.TestBitUser;
 
 public interface IDeclarativeTransactionManagementService {
+	public void createUserWithSimpleJdbcInsert() throws Exception;
+	
 	public void analyzeDeclarativeTransactionManagementBaseProxy() throws Exception;
 	
 	public void createDeclarativeTransactionManagementBaseProxy() throws Exception;

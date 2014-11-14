@@ -19,6 +19,14 @@ public class DeclarativeTransactionManagementServiceImpl implements IDeclarative
 	@Autowired
 	@Qualifier("com.example.spring.dao.impls.TestBitDAOImpl")
 	private ITestBitDAO testBitDAO;
+	
+	public void createUserWithSimpleJdbcInsert() throws Exception {
+		TestBitUser bitUser = new TestBitUser();
+		bitUser.setId(4);
+		bitUser.setName("刘璐");
+		testBitDAO.insertUserWithSimpleJdbcInsert(bitUser);
+	}
+	
 	public void analyzeDeclarativeTransactionManagementBaseProxy() throws Exception{
 		log.debug("invoking analyzeDeclarativeTransactionManagementBaseProxy analyzeDeclarativeTransactionManagementBaseProxy() method");
 	}
@@ -47,7 +55,7 @@ public class DeclarativeTransactionManagementServiceImpl implements IDeclarative
 	
 	public String readUserNameById(int id) throws Exception{
 		String name = testBitDAO.getUserNameById(id);
-		log.info("read User Is Success,User Id is" + id + " And Name is " + name);
+		log.info("read User Is Success,User Id is " + id + " And Name is " + name);
 		return name;
 	}
 	
