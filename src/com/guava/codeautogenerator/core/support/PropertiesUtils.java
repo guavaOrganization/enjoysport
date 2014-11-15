@@ -1,4 +1,4 @@
-package com.guava.codeautogenerator.support;
+package com.guava.codeautogenerator.core.support;
 
 import java.io.IOException;
 import java.util.Arrays;

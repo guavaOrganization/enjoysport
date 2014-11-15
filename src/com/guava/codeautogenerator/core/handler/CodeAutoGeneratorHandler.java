@@ -1,7 +1,7 @@
 package com.guava.codeautogenerator.core.handler;
 
 import com.guava.codeautogenerator.core.ParameterHolder;
-import com.guava.codeautogenerator.exception.CodeAutoGeneratorException;
+import com.guava.codeautogenerator.core.exception.CodeAutoGeneratorException;
 
 /**
  * 

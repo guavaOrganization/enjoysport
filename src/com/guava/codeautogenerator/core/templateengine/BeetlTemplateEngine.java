@@ -7,9 +7,9 @@ import org.beetl.core.resource.ClasspathResourceLoader;
 
 import com.guava.codeautogenerator.core.ParameterHolder;
 import com.guava.codeautogenerator.core.ReturnValueHolder;
+import com.guava.codeautogenerator.core.exception.CodeAutoGeneratorException;
 import com.guava.codeautogenerator.core.mapping.AbstractBeetlCodeAutoMapping;
 import com.guava.codeautogenerator.core.mapping.CodeAutoGeneratorMapping;
-import com.guava.codeautogenerator.exception.CodeAutoGeneratorException;
 
 public class BeetlTemplateEngine implements TemplateEngine {
 	public ReturnValueHolder render(ParameterHolder parameterHolder, CodeAutoGeneratorMapping autoGeneratorMapping) throws CodeAutoGeneratorException {
@@ -21,6 +21,7 @@ public class BeetlTemplateEngine implements TemplateEngine {
 			Template template = gt.getTemplate(autoMapping.getTemplateFilePath());
 			template.binding(autoMapping.getTemplateParam(parameterHolder));
 			String content = template.render();
+			System.out.println(content);
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,4 +1,4 @@
-package com.guava.codeautogenerator;
+package com.guava.codeautogenerator.test;
 
 import java.io.IOException;
 

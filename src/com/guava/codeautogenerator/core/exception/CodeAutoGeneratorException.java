@@ -1,4 +1,4 @@
-package com.guava.codeautogenerator.exception;
+package com.guava.codeautogenerator.core.exception;
 
 @SuppressWarnings("serial")
 public class CodeAutoGeneratorException extends RuntimeException {

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 import com.guava.codeautogenerator.core.ParameterHolder;
+import com.guava.codeautogenerator.core.exception.CodeAutoGeneratorException;
 import com.guava.codeautogenerator.core.handler.AbstractCodeAutoGeneratorHandler;
+import com.guava.codeautogenerator.core.support.PropertiesUtils;
 import com.guava.codeautogenerator.core.templateengine.TemplateEngine;
-import com.guava.codeautogenerator.exception.CodeAutoGeneratorException;
-import com.guava.codeautogenerator.support.PropertiesUtils;
 
 public class SpringJdbcAutoGeneratorHandler extends AbstractCodeAutoGeneratorHandler {
 	private static final String SPRING_JDBC_PROPERTIES_PATH = "/com/guava/codeautogenerator/springjdbc/SpringJdbcCodeAutoGeneratorDefault.properties";

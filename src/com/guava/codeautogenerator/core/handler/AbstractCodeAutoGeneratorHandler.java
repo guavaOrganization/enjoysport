@@ -11,18 +11,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.guava.codeautogenerator.core.ParameterHolder;
+import com.guava.codeautogenerator.core.exception.CodeAutoGeneratorException;
 import com.guava.codeautogenerator.core.mapping.CodeAutoGeneratorMapping;
+import com.guava.codeautogenerator.core.support.PropertiesUtils;
 import com.guava.codeautogenerator.core.templateengine.BeetlTemplateEngine;
 import com.guava.codeautogenerator.core.templateengine.TemplateEngine;
-import com.guava.codeautogenerator.exception.CodeAutoGeneratorException;
-import com.guava.codeautogenerator.support.PropertiesUtils;
 
 public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGeneratorHandler {
 	private transient static Log log = LogFactory.getLog(AbstractCodeAutoGeneratorHandler.class);
 
 	private static final String CODE_STYLE_DEFAULT = "SpringJdbc";
 	private static final String DEFAULT_SEPARATOR = ",";
-	private static final String DEFAULT_PROPERTIES_PATH = "/com/guava/codeautogenerator/CodeAutoGeneratorDefault.properties";
+	private static final String DEFAULT_PROPERTIES_PATH = "/com/guava/codeautogenerator/core/CodeAutoGeneratorDefault.properties";
 	private static final String KEY_ISCONCURRENCE = "CodeAutoGenerator.IsConcurrence";
 	private static final String KEY_CODESTYLE= "CodeAutoGenerator.CodeStyle";
 	private static final String KEY_TEMPLATEENGINE = "CodeAutoGenerator.TemplateEngine";
