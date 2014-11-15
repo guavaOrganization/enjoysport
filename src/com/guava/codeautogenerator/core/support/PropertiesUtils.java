@@ -53,4 +53,15 @@ public class PropertiesUtils {
 		String value =getProperty(properties, key, "");
 		return Arrays.asList(value.split(separator));
 	}
+	
+	public static int getProperty(Properties properties, String key, int defaultVale) {
+		if (null == properties || null == key)
+			return defaultVale;
+		try {
+			int ret = Integer.parseInt(properties.getProperty(key));
+			return ret;
+		} catch (Exception e) {
+			return defaultVale;
+		}
+	}
 }

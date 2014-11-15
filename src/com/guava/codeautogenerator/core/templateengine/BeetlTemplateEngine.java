@@ -1,5 +1,7 @@
 package com.guava.codeautogenerator.core.templateengine;
 
+import java.io.ByteArrayInputStream;
+
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -20,9 +22,10 @@ public class BeetlTemplateEngine implements TemplateEngine {
 			GroupTemplate gt = new GroupTemplate(loader, configuration);
 			Template template = gt.getTemplate(autoMapping.getTemplateFilePath());
 			template.binding(autoMapping.getTemplateParam(parameterHolder));
-			String content = template.render();
-			System.out.println(content);
-			return null;
+			ReturnValueHolder returnValueHolder = new ReturnValueHolder();
+			returnValueHolder.setIs(new ByteArrayInputStream(template.render().getBytes()));
+			returnValueHolder.setFileName(autoMapping.getFileName(parameterHolder));
+			return returnValueHolder;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new CodeAutoGeneratorException(e.getMessage(), e.getCause());

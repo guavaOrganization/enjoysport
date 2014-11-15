@@ -12,6 +12,7 @@ public class ParameterHolder {
 	private TemplateEngine templateEngine;
 	private Object customParameter;
 	private boolean isConcurrence;
+	private String fileSuffix;
 
 	public List<CodeAutoGeneratorMapping> getCodeAutoGeneratorMappings() {
 		return codeAutoGeneratorMappings;
@@ -59,5 +60,13 @@ public class ParameterHolder {
 
 	public void setConcurrence(boolean isConcurrence) {
 		this.isConcurrence = isConcurrence;
+	}
+
+	public String getFileSuffix() {
+		return fileSuffix;
+	}
+
+	public void setFileSuffix(String fileSuffix) {
+		this.fileSuffix = fileSuffix;
 	}
 }

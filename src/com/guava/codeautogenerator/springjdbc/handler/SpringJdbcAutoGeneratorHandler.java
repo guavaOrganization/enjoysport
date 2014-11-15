@@ -1,5 +1,6 @@
 package com.guava.codeautogenerator.springjdbc.handler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -31,5 +32,9 @@ public class SpringJdbcAutoGeneratorHandler extends AbstractCodeAutoGeneratorHan
 			throw new CodeAutoGeneratorException("The Parameter 'customParameter' Is Null");
 		if(null == parameterHolder || !(parameterHolder.getTemplateEngine() instanceof TemplateEngine))
 			throw new CodeAutoGeneratorException("ParameterHolder's field[templateEngine] is null or not implements TemplateEngine");
+	}
+	@Override
+	protected String getTheEndFileFullPathAndName() {
+		return super.PROJECT_ROOT_PATH + File.separatorChar + System.currentTimeMillis() + "_" + getTheEndFileName();
 	}
 }

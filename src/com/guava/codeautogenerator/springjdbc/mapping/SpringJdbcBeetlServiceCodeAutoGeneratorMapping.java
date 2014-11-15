@@ -19,4 +19,9 @@ public class SpringJdbcBeetlServiceCodeAutoGeneratorMapping extends AbstractBeet
 		map.put("className", "TestService");
 		return map;
 	}
+
+	@Override
+	public String getFileName(ParameterHolder parameterHolder) {
+		return "ITestService";
+	}
 }

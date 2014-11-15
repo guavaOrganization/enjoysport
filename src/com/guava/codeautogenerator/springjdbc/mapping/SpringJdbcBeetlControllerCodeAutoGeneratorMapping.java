@@ -19,4 +19,9 @@ public class SpringJdbcBeetlControllerCodeAutoGeneratorMapping extends AbstractB
 		map.put("className", "TestController");
 		return map;
 	}
+
+	@Override
+	public String getFileName(ParameterHolder parameterHolder) {
+		return "TestController";
+	}
 }
