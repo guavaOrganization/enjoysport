@@ -40,6 +40,8 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 	public static final String KEY_THE_END_FILENAME = "CodeAutoGenerator.TheEndFileName";
 	public static final String KEY_THE_END_BUFFERSIZE = "CodeAutoGenerator.BufferSize";
 	public static final String PROJECT_ROOT_PATH = System.getProperty("user.dir");
+	public static final String POINT_SYMBOL = ".";
+	public static final String ESCAPE_SYMBOL = "\\";
 	
 	private boolean isConcurrence;
 	private String codeStyle = CODE_STYLE_DEFAULT;// 代码风格，如：spring-jdbc、spring-hibernate
@@ -147,6 +149,13 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 			parameterHolder.setCodeAutoGeneratorMappings(this.codeAutoGeneratorMappings);
 		if(StringUtils.isBlank(parameterHolder.getFileSuffix()))
 			parameterHolder.setFileSuffix(this.fileSuffix);
+		
+		String[] temps = parameterHolder.getCodeModuleName().split(ESCAPE_SYMBOL + POINT_SYMBOL);
+		StringBuilder sb = new StringBuilder();
+		for (String temp : temps) {
+			sb.append(temp).append(File.separatorChar);
+		}
+		parameterHolder.setFileModuleName(sb.toString());
 	}
 	
 	private void checkParameterHolder(ParameterHolder parameterHolder) throws CodeAutoGeneratorException {

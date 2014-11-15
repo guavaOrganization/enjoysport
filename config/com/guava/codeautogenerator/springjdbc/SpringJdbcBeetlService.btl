@@ -1,1 +1,5 @@
-这是我的第一个代码自动生成框架实例,定义了${className}
+package ${moduleName}.${subModuleName};
+
+public class ${className} {
+	
+}

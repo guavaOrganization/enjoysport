@@ -24,7 +24,7 @@ public class BeetlTemplateEngine implements TemplateEngine {
 			template.binding(autoMapping.getTemplateParam(parameterHolder));
 			ReturnValueHolder returnValueHolder = new ReturnValueHolder();
 			returnValueHolder.setIs(new ByteArrayInputStream(template.render().getBytes()));
-			returnValueHolder.setFileName(autoMapping.getFileName(parameterHolder));
+			returnValueHolder.setFileName(autoMapping.getFullPathAndFileName(parameterHolder));
 			return returnValueHolder;
 		} catch (Exception e) {
 			e.printStackTrace();

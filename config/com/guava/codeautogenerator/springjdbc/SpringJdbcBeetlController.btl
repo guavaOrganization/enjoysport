@@ -1,1 +1,5 @@
-记得撒旦撒${className}
+package ${moduleName}.${subModuleName};
+
+public class ${className} {
+	
+}

@@ -10,9 +10,9 @@ public class ParameterHolder {
 	private String codeModuleName;
 	private String codeStyle;
 	private TemplateEngine templateEngine;
-	private Object customParameter;
 	private boolean isConcurrence;
 	private String fileSuffix;
+	private String fileModuleName;
 
 	public List<CodeAutoGeneratorMapping> getCodeAutoGeneratorMappings() {
 		return codeAutoGeneratorMappings;
@@ -38,14 +38,6 @@ public class ParameterHolder {
 		this.templateEngine = templateEngine;
 	}
 
-	public Object getCustomParameter() {
-		return customParameter;
-	}
-
-	public void setCustomParameter(Object customParameter) {
-		this.customParameter = customParameter;
-	}
-
 	public String getCodeStyle() {
 		return codeStyle;
 	}
@@ -68,5 +60,13 @@ public class ParameterHolder {
 
 	public void setFileSuffix(String fileSuffix) {
 		this.fileSuffix = fileSuffix;
+	}
+
+	public String getFileModuleName() {
+		return fileModuleName;
+	}
+
+	public void setFileModuleName(String fileModuleName) {
+		this.fileModuleName = fileModuleName;
 	}
 }

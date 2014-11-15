@@ -8,7 +8,8 @@ import com.guava.codeautogenerator.core.ParameterHolder;
 import com.guava.codeautogenerator.core.exception.CodeAutoGeneratorException;
 import com.guava.codeautogenerator.core.handler.AbstractCodeAutoGeneratorHandler;
 import com.guava.codeautogenerator.core.support.PropertiesUtils;
-import com.guava.codeautogenerator.core.templateengine.TemplateEngine;
+import com.guava.codeautogenerator.core.support.StringUtils;
+import com.guava.codeautogenerator.springjdbc.SpringJdbcParameterHolder;
 
 public class SpringJdbcAutoGeneratorHandler extends AbstractCodeAutoGeneratorHandler {
 	private static final String SPRING_JDBC_PROPERTIES_PATH = "/com/guava/codeautogenerator/springjdbc/SpringJdbcCodeAutoGeneratorDefault.properties";
@@ -23,18 +24,18 @@ public class SpringJdbcAutoGeneratorHandler extends AbstractCodeAutoGeneratorHan
 
 	@Override
 	protected void preprocessingAutoGeneratorCodeInternal(ParameterHolder parameterHolder) throws CodeAutoGeneratorException{
-		setNeedCheckParameter(false);// 设置是否需要校验入参
+		setNeedCheckParameter(true);// 设置是否需要校验入参
 	}
 	
 	@Override
 	protected void checkParameterHolderInternal(ParameterHolder parameterHolder) throws CodeAutoGeneratorException{// 校验
-		if(null == parameterHolder.getCustomParameter())
-			throw new CodeAutoGeneratorException("The Parameter 'customParameter' Is Null");
-		if(null == parameterHolder || !(parameterHolder.getTemplateEngine() instanceof TemplateEngine))
-			throw new CodeAutoGeneratorException("ParameterHolder's field[templateEngine] is null or not implements TemplateEngine");
+		SpringJdbcParameterHolder springJdbcParameterHolder = (SpringJdbcParameterHolder) parameterHolder;
+		if (StringUtils.isBlank(springJdbcParameterHolder.getBaseBeanName()))
+			throw new CodeAutoGeneratorException("The Parameter 'baseBeanName' Is Null");
 	}
+	
 	@Override
 	protected String getTheEndFileFullPathAndName() {
-		return super.PROJECT_ROOT_PATH + File.separatorChar + System.currentTimeMillis() + "_" + getTheEndFileName();
+		return PROJECT_ROOT_PATH + File.separatorChar + "tempDir" + File.separatorChar + System.currentTimeMillis() + "_" + getTheEndFileName();
 	}
 }
