@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.guava.codeautogenerator.core.CodeAutoGeneratorHandler;
 import com.guava.codeautogenerator.core.ParameterHolder;
+import com.guava.codeautogenerator.core.handler.CodeAutoGeneratorHandler;
 import com.guava.codeautogenerator.springjdbc.handler.SpringJdbcAutoGeneratorHandler;
 
 public class CodeAutoGeneratorTest {

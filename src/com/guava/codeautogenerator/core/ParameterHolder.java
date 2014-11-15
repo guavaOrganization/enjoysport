@@ -2,6 +2,9 @@ package com.guava.codeautogenerator.core;
 
 import java.util.List;
 
+import com.guava.codeautogenerator.core.mapping.CodeAutoGeneratorMapping;
+import com.guava.codeautogenerator.core.templateengine.TemplateEngine;
+
 public class ParameterHolder {
 	private List<CodeAutoGeneratorMapping> codeAutoGeneratorMappings;
 	private String codeModuleName;

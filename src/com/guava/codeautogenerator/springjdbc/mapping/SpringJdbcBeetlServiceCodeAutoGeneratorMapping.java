@@ -3,9 +3,10 @@ package com.guava.codeautogenerator.springjdbc.mapping;
 import java.util.Map;
 
 import com.guava.codeautogenerator.core.ParameterHolder;
+import com.guava.codeautogenerator.core.mapping.AbstractBeetlCodeAutoMapping;
 import com.guava.codeautogenerator.exception.CodeAutoGeneratorException;
 
-public class SpringJdbcBeetlServiceCodeAutoGeneratorMapping extends AbstractSpringJdbcBeetlCodeAutoMapping{
+public class SpringJdbcBeetlServiceCodeAutoGeneratorMapping extends AbstractBeetlCodeAutoMapping{
 	@Override
 	public String getTemplateFilePath() throws CodeAutoGeneratorException {
 		return null;

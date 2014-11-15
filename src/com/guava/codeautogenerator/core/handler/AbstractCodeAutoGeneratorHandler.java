@@ -1,4 +1,4 @@
-package com.guava.codeautogenerator.core;
+package com.guava.codeautogenerator.core.handler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,8 +10,11 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.guava.codeautogenerator.core.ParameterHolder;
+import com.guava.codeautogenerator.core.mapping.CodeAutoGeneratorMapping;
+import com.guava.codeautogenerator.core.templateengine.BeetlTemplateEngine;
+import com.guava.codeautogenerator.core.templateengine.TemplateEngine;
 import com.guava.codeautogenerator.exception.CodeAutoGeneratorException;
-import com.guava.codeautogenerator.springjdbc.templateengine.BeetlTemplateEngine;
 import com.guava.codeautogenerator.support.PropertiesUtils;
 
 public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGeneratorHandler {
@@ -88,7 +91,6 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 				}
 			}
 		}
-		// 解析properties，装饰Handler相关属性
 	}
 	
 	@Override
