@@ -1,14 +1,14 @@
 package com.guava.codeautogenerator.core;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ParameterHolder {
-	private List<CodeAutoGeneratorMapping> codeAutoGeneratorMappings = new ArrayList<CodeAutoGeneratorMapping>();
+	private List<CodeAutoGeneratorMapping> codeAutoGeneratorMappings;
 	private String codeModuleName;
 	private String codeStyle;
 	private TemplateEngine templateEngine;
 	private Object customParameter;
+	private boolean isConcurrence;
 
 	public List<CodeAutoGeneratorMapping> getCodeAutoGeneratorMappings() {
 		return codeAutoGeneratorMappings;
@@ -48,5 +48,13 @@ public class ParameterHolder {
 
 	public void setCodeStyle(String codeStyle) {
 		this.codeStyle = codeStyle;
+	}
+
+	public boolean isConcurrence() {
+		return isConcurrence;
+	}
+
+	public void setConcurrence(boolean isConcurrence) {
+		this.isConcurrence = isConcurrence;
 	}
 }
