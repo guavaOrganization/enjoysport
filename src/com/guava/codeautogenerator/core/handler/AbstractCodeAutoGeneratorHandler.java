@@ -10,12 +10,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.guava.codeautogenerator.core.CodeAutoGeneratorCallable;
 import com.guava.codeautogenerator.core.ParameterHolder;
 import com.guava.codeautogenerator.core.ReturnValueHolder;
 import com.guava.codeautogenerator.core.exception.CodeAutoGeneratorException;
@@ -39,6 +44,7 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 	public static final String KEY_FILESUFFIX = "CodeAutoGenerator.FileSuffix";
 	public static final String KEY_THE_END_FILENAME = "CodeAutoGenerator.TheEndFileName";
 	public static final String KEY_THE_END_BUFFERSIZE = "CodeAutoGenerator.BufferSize";
+	public static final String KEY_DEFAULT_THREADS = "CodeAutoGenerator.DefaultThreads";
 	public static final String PROJECT_ROOT_PATH = System.getProperty("user.dir");
 	public static final String POINT_SYMBOL = ".";
 	public static final String ESCAPE_SYMBOL = "\\";
@@ -54,6 +60,9 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 	private String fileSuffix = ".java";
 	private String theEndFileName = "tempDir.zip";
 	private int bufSize = 1024;
+	private int concurrenceThreads;// 并行生成代码时，对应执行线程池的线程数量
+	private int MAX_THREADS = 10;// 最大线程池池大小
+	private int DEFAULT_THREADS = 5;// 默认线程池大小
 	
 	private List<InputStream> iss = new ArrayList<InputStream>();
 
@@ -87,6 +96,11 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 				this.codeStyle = PropertiesUtils.getProperty(properties, KEY_CODESTYLE, CODE_STYLE_DEFAULT);
 			} else if (KEY_THE_END_BUFFERSIZE.equals(key)) {				
 				this.bufSize = PropertiesUtils.getProperty(properties, KEY_THE_END_BUFFERSIZE, bufSize);
+			} else if (KEY_DEFAULT_THREADS.equals(key)){
+				this.concurrenceThreads = PropertiesUtils.getProperty(properties, KEY_DEFAULT_THREADS, concurrenceThreads);
+				if(this.concurrenceThreads <=0 || this.concurrenceThreads > MAX_THREADS){
+					this.concurrenceThreads = DEFAULT_THREADS;
+				}
 			} else if (KEY_TEMPLATEENGINE.equals(key)) {
 				String templateEngineStr = PropertiesUtils.getProperty(properties, key, StringUtils.EMPTY);
 				try {
@@ -182,21 +196,44 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 
 	protected void handleAutoGeneratorCodeInternal(ParameterHolder parameterHolder) throws CodeAutoGeneratorException{
 			try {
-				ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(getTheEndFileFullPathAndName()));
-				byte[] buf = new byte[bufSize];
+				List<ReturnValueHolder> holders = new ArrayList<ReturnValueHolder>();
 				if (parameterHolder.isConcurrence() || this.isConcurrence) {// 使用多线程并发模式生成文件
-					
-				} else {
+					if(log.isInfoEnabled())
+						log.info("=================使用多线程并发生成文件==================");
+					ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(this.concurrenceThreads);
+					List<Future<ReturnValueHolder>> results = new ArrayList<Future<ReturnValueHolder>>();
 					for (CodeAutoGeneratorMapping mapping : parameterHolder.getCodeAutoGeneratorMappings()) {
-						ReturnValueHolder returnValueHolder = parameterHolder.getTemplateEngine().render(parameterHolder, mapping);
-						InputStream stream = returnValueHolder.getIs();
-						zipOutputStream.putNextEntry(new ZipEntry(returnValueHolder.getFileName() + parameterHolder.getFileSuffix()));
-						int len;
-						while ((len = stream.read(buf)) > 0) {
-							zipOutputStream.write(buf, 0, len);
-						}
-						iss.add(stream);
+						results.add(executor.submit(new CodeAutoGeneratorCallable(mapping, parameterHolder)));
 					}
+					for (int i = 0; null != results && i < results.size(); i++) {
+						try {
+							holders.add(results.get(i).get());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							throw new CodeAutoGeneratorException(e.getMessage(), e.getCause());
+						} catch (ExecutionException e) {
+							e.printStackTrace();
+							throw new CodeAutoGeneratorException(e.getMessage(), e.getCause());
+						}
+					}
+				} else {
+					if(log.isInfoEnabled())
+						log.info("=================使用单线程线程逐步生成文件==================");
+					for (CodeAutoGeneratorMapping mapping : parameterHolder.getCodeAutoGeneratorMappings()) {
+						holders.add(parameterHolder.getTemplateEngine().render(parameterHolder, mapping));
+					}
+				}
+				byte[] buf = new byte[bufSize];
+				ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(getTheEndFileFullPathAndName()));
+				for (int i = 0; null != holders && i < holders.size(); i++) {
+					ReturnValueHolder returnValueHolder = holders.get(i);
+					InputStream stream = returnValueHolder.getIs();
+					zipOutputStream.putNextEntry(new ZipEntry(returnValueHolder.getFileName() + parameterHolder.getFileSuffix()));
+					int len;
+					while ((len = stream.read(buf)) > 0) {
+						zipOutputStream.write(buf, 0, len);
+					}
+					iss.add(stream);
 				}
 				zipOutputStream.closeEntry();
 				zipOutputStream.close();
@@ -266,5 +303,13 @@ public abstract class AbstractCodeAutoGeneratorHandler implements CodeAutoGenera
 
 	public String getTheEndFileName() {
 		return theEndFileName;
+	}
+
+	public int getConcurrenceThreads() {
+		return concurrenceThreads;
+	}
+
+	public void setConcurrenceThreads(int concurrenceThreads) {
+		this.concurrenceThreads = concurrenceThreads;
 	}
 }

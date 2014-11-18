@@ -35,6 +35,6 @@ public class SpringJdbcBeetlServiceCodeAutoGeneratorMapping extends AbstractBeet
 	@Override
 	public String getClassName(ParameterHolder parameterHolder) {
 		SpringJdbcParameterHolder springJdbcParameterHolder = (SpringJdbcParameterHolder) parameterHolder;
-		return springJdbcParameterHolder.getBaseBeanName() + StringUtils.SERVICE_CLASS_SUFFIX_NAME;
+		return StringUtils.INTERFACE_PREFIX + springJdbcParameterHolder.getBaseBeanName() + StringUtils.SERVICE_CLASS_SUFFIX_NAME;
 	}
 }
