@@ -42,3 +42,4 @@ html/META-INF
 .gitignore
 html/WEB-INF/lib
 html/WEB-INF/classes
+tempDir
