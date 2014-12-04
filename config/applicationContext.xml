@@ -118,6 +118,7 @@
 		<property name="contentType" value="text/html;charset=UTF-8" />
 	</bean>
 	<!-- Beetl视图技术 -->
+	
 	<!-- JSP视图解析器 -->
 	<bean name="JSPViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<!-- 注意JSP的这个视图解析器order必须在最后 -->

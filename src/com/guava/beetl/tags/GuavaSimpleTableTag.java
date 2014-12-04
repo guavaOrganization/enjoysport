@@ -30,6 +30,7 @@ public class GuavaSimpleTableTag extends Tag {
 		List<Map> dataList = new ArrayList<Map>();
 		
 		Map<String, String> dataMap = new HashMap<String, String>();
+		dataMap.put("title", "Beetl 自定义标签");
 		dataMap.put("Name", "陈小俊");
 		dataMap.put("Age", "26");
 		dataMap.put("Province", "江西省");
