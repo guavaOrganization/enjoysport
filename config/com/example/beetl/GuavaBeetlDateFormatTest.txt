@@ -1,2 +1,0 @@
-today is ${date(),guavaBeetlDateFormat=""}
-today is ${date(),guavaBeetlDateFormat="yyyy年MM月dd日"}

@@ -1,6 +1,0 @@
-<%
-	/**
-	* 共享变量指在所有模板中都可以引用的变量，可过groupTemplate.setSharedVars(Map<String,  Object> sharedVars)传入的变量,这些变量能在 所有模板 的任何一个地方
-	*/
-%>
-共享变量2，我的名字叫${name}

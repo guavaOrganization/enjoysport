@@ -1,4 +1,0 @@
-<%guavaTestTag("/com/example/beetl/GuavaTestTag.btl",{title:'标签测试',author:'陈俊'}){
-%>
-这个部分的值可以通过Tag.getBodyContent()方法获取
-<%}%>

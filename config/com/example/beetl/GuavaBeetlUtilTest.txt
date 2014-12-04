@@ -1,5 +1,0 @@
-<%
-	var str = " 我是陈俊";
-	var isBlankString = guavaBeetlUtil.isBlankString(str);
-%>
-${str} 是否为空字符串-->${isBlankString}
