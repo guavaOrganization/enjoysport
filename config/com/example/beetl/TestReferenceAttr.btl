@@ -1,0 +1,46 @@
+<%
+/**
+ * 需要采用IMPORT_PACKAGE将类所在的包引入，或采用Configuration.addPkg将包引入
+ *@type(User user,List<User> list)
+ */
+// 引用属性
+// 属性引用是模板中的重要一部分，beetl支持属性引用如果javascript的支持方式一样，如下
+// 1 Beetl支持通过”.”号来访问对象的的属性，如果javascript一样。如果User对象有个getName()方法，那么在模板中，可以通过${xxx.name}来访问
+%>
+${user.name}
+
+<%
+// 2 如果模板变量是数组或者List类，这可以通过[] 来访问，如${userList[0]}
+%>
+${list[1]}
+${list[1].name}
+
+<%
+// 3 如果模板变量是Map类，这可以通过[]来访问，如${map[“name”]},如果key值是字符串类型，也可以使用${map.name}.但不建议这么使用，因为会让模板阅读者误以为是一个Pojo对象
+%>
+${map["company"]}
+${map.company} // 不介意这么使用
+
+<%
+//4 Beetl也支持Generic Get方式，即如果对象有一个public Object get(String key)方法，可以通过”.”号或者[]来访
+//  问，譬如 ${activityRecord.name}或者${activityRecord[“name”] }都将调用 activityRecord的 
+//  get(String key)方法。如果对象既有具体属性，又有Generic get（这种模型设计方式是不值得鼓励），则以具体属性优先级高.
+
+//5 Beetl也可以通过[]来引用属性，如${user[“name”]} 相当于${user.name}.这跟javascript保持一致。但建议不这么
+//  做，因为容易让阅读模板的人误认为这是一个Map类型
+%>
+${user["id"]} // 不介意这么使用，容易被误导为Map
+
+${companyName[map['company']]} //多重结构
+
+<%
+//6 Beetl 还可以定位额外的对象属性，而无需更改java对象，这叫着虚拟属性，如，对于所有集合，数组，都有共同的虚拟熟悉size.虚拟属性是“.~”+虚拟1属性名
+%>
+list的长度为${list.~size}
+<%
+	for(user in list){
+%>
+工号：${user.id} , 姓名：${user.name}
+<%	
+	}
+%>

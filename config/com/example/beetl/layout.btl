@@ -1,0 +1,4 @@
+title is ${title}
+name is ${name}
+body content ${layoutContent}
+footer

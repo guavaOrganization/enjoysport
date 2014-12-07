@@ -1,0 +1,8 @@
+<%
+// 需要根据ResourceLoader决定
+// 如果是ClasspathResourceLoader,此文件定义在/functions/目录下即可
+// 如果是WebAppResourceLoader,此文件需要定义在Root(此工程为)的functions目录
+//para0,para1有函数调用传入
+var current=para0,total=para1,style=para2!'simple';
+%>
+当前页面${current},总共${total};

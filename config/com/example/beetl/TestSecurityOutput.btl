@@ -1,0 +1,87 @@
+<%
+// 安全输出
+// 安全输出是任何一个模板引擎必须重视的问题，否则，将极大困扰模板开发者。Beetl中，如果要输出的模板变量为null，则beetl将不做输出，这点不同于JSP，JSP输出null，也不同于Feemarker
+// 如果没有用!,它会报错.
+%>
+<%
+// 模板中还有俩中情况会导致模板输出异常
+// a、有时候模板变量并不存在（譬如子模板里）
+// b、模板变量为null，但输出的是此变量的一个属性，如${user.wife.name}
+// 针对前俩种种情况，可以在变量引用后加上！以提醒beetl这是一个安全输出的变量。
+%>
+
+<%
+// 如果使用${user}将会报错，错误信息为"VAR_NOT_DEFINED"
+%>
+${user!}
+
+<%
+	// 可以在!后增加一个常量（字符串，数字类型等），或者另外一个变量，方法，本地调用，作为默认输出
+%>
+${user!"八两俊"}
+<%
+	// 默认值时，可以调用java的常量
+%>
+${user!@com.example.beetl.test.User.DEFAULT_NAME}
+<%
+// 使用格式${!(变量)},这样，在变量引用发生任何异常情况下，都不作输出，
+// 如果发生异常则忽略，继续渲染
+%>
+${!(user.namea)}
+<%
+//值得注意的是，在变量后加上!不仅仅可以应用于占位符输出(但主要是应用于占位符输出)，也可以用于表达式中
+%>
+${user.name!'N/A'+user.age!}
+
+<%
+	// 在有些模板里，可能整个模板都需要安全输出，也可能模板的部分需要安全输出，使用者不必为每一个表达式使用！，可以使用 beetl的安全指示符号来完成安全输出 如：
+	// 打开安全输出
+	DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+	${安全输出}
+	我这个部分是安全输出部分，无需担心，尽管使用
+<%
+	//关闭安全输出。
+	DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>
+
+<%
+	// 在for-in 循环中 ，也可以为集合变量增加安全输出指示符号，这样，如果集合变量为null，也可以不进入循环体
+	var list = null;
+	for(item in list!){
+		println("has data");
+	}elsefor{
+		println("no data");
+	}
+%>
+
+<%
+	// 变量是否存在
+	// 判断变量是否存在，可以采用内置的has或者isEmpty方法来判断，参数是变量
+	if(has(flag)){
+		println("flag");
+	}else{
+		println("no flag");
+	}
+	
+	var k = 1;
+	var haseKResult = has(k);// has这个方法在beetl实现上还是有点问题的，或者我在使用上的方式有问题
+	if(haseKResult){
+		println("k：" + 1);
+	}else{
+		println("no k");
+	}
+%>
+haseKResult ： ${haseKResult}
+
+<%
+//安全输出表达式
+//安全输出表达式可以包括
+//1、字符串常量,如 ${user.count!"无结果"}
+//2、boolean常量 ${user.count!false}
+//3、数字常量，仅限于正数，因为如果是负数，则类似减号，容易误用，因此，如果需要表示负数，请用括号，如${user.count!(-1)}
+//4、class直接调用，如${user.count!@User.DEFAULT_NUM}
+//5、方法调用，如 ${user.count!getDefault()}
+//6、属性引用，如 ${user.count!user.maxCount}
+//7、任何表达式，需要用括号
+%>

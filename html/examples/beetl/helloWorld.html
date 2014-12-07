@@ -8,7 +8,11 @@
   <h1>欢迎使用，${name}女士</h1>
   <%GuavaSimpleTableTag({tableId:'myFirstTable'}, 
    [{Col:'Name',ColTitle:'姓名'}, {Col:'Age',ColTitle:'年龄'}, {Col:'Province',ColTitle:'省市'}])
-  {}%>
+  {
+  %>
+  	我是主体部分
+  <%
+  }%>
 </body>
 <script type="text/javascript">
 	var name = "${name}";

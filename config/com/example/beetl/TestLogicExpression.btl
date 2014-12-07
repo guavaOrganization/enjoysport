@@ -1,0 +1,15 @@
+<%
+	var a = 1;
+	var b = "good";
+	var c = null;
+	var result = false;
+	if(a == 1 && b == "good" && c == null){
+		result = true;
+	} else{
+		result = false;
+	}
+%>
+result为 ${result}
+
+${a==1?'ok':''}
+${a!=1?'':'ok'}

@@ -1,0 +1,9 @@
+${@user.getName()}
+${@user.setName("猪古丽")}
+${@user.getName()}
+<%
+	var DEFAULT_NAME = @com.example.beetl.test.User.DEFAULT_NAME;
+%>
+${DEFAULT_NAME}
+${@com.example.beetl.test.User.DEFAULT_NAME}
+<%/**${@com.example.beetl.test.User.getName()}*/%>

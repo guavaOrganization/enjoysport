@@ -1,0 +1,10 @@
+<%
+	var a = 2;
+	var b = 3;
+	var result = a + b;
+	
+	//千万不要在定界符里使用占位符号，因为占位符仅仅嵌在静态文本里
+	// var result = ${a} + b;   error
+%>
+hello Delimiter,The Result is ${result};
+${{key:1,value:2\}}

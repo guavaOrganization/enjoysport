@@ -1,0 +1,4 @@
+<%
+	var date = date();
+%>
+${date,beetlCustomFormat="yyyy年MM月dd月"}

@@ -1,0 +1,6 @@
+<%
+	var date = date();
+	// dateFormat为对应的格式化方法，yyyy-MM-dd为参数
+%>
+Today is ${date,dateFormat="yyyy-MM-dd"}.
+Todat is ${date,dateFormat}

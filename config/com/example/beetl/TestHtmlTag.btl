@@ -1,0 +1,19 @@
+<%
+	// 这个footer html标签定义在/htmltag/(相对于classpath)目录下
+	// 如果你选择的是WebAppResourceLoader,这个应该定义在/html/htmltag/
+	var name = "猪古丽";
+%>
+<#footer style="simple" name = "${name}" />
+<#footer style="other" name = "八两俊" phone="18502075239" />
+<#input id="input"/>
+
+<#table id="table">
+标签提内容
+<%
+	for(var i = 0; i < 5;i++){
+%>
+	<#input id="${i}" name="${name}"/>
+<%	
+	}
+%>
+</#table>

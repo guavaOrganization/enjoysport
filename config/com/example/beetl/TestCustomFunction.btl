@@ -1,0 +1,6 @@
+<%
+beetlCustomFunction("我是参数1,你要打印我");
+beetlCustomFunction(beetlCustomUtilFunction.wipeOffBlank("," + " 其实我的前面有空格，我的后面也有空格 " + ","));
+beetlCustomUtilFunction.print("打印我");
+page(4,20);
+%>

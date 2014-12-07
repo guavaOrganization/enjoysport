@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.beetl.core.BodyContent;
 import org.beetl.core.Tag;
 import org.beetl.core.Template;
 import org.beetl.core.misc.BeetlUtil;
@@ -44,6 +45,13 @@ public class GuavaSimpleTableTag extends Tag {
 
 		t.binding("dataList", dataList);
 		t.binding("colList", colList);
+		
+		BodyContent content = getBodyContent();
+		if (this.args.length == 3) {
+			t.binding((String) this.args[2], content);
+		} else {
+			t.binding("layoutContent", content);
+		}
 		t.renderTo(this.ctx.byteWriter);
 	}
 }

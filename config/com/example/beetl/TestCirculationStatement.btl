@@ -1,0 +1,134 @@
+<%
+// 循环语句
+// Beetl支持丰富的循环方式，如for-in,for(exp;exp;exp)，以及while循环，以及循环控制语句break;continue; 另外，如果没有进入for循环体，还可以执行else for指定的语句。
+
+// for-in
+// for-in循环支持遍历集合对象，对于List和数组来说以及Iterator，对象就是集合对象，对于Map来说，对象就是Map.entry,如下俩个例子
+%>
+<%
+	// 迭代list
+	// 第三行代码userLP是Beetl隐含定义的变量，能在循环体内使用。其命名规范是item名称后加上LP，他提供了当前循环的信息
+	for(user in list){
+		print(userLP.index);// 当前的索引，从1
+		print(",");
+		print(userLP.size);// 集合的长度
+		print(",");
+		print(userLP.first);// 是否是第一个
+		print(",");
+		print(userLP.last);// 是否是最后一个
+		print(",");
+		print(userLP.even);// 索引是否是偶数
+		print(",");
+		print(userLP.odd);// 索引是否是奇数
+		print(",");
+		println(user.name);	
+	}
+%>
+
+<%
+	// 迭代Map
+	for(entry in companyName){
+		var key = entry.key;
+		var value = entry.value;
+		println("key：" + key + ",value：" + value);
+	}
+%>
+
+<%
+	var a = [1,2,3];
+	for(var i=0;i<a.~size;i++){
+		println(a[i]);
+	}
+%>
+
+<%
+	// while语句
+	println("while 语句学习");
+	var index = 0;
+	while(index<5){
+		println(index);
+		index++;
+	}
+%>
+
+<%
+	// elsefor
+	var array = [];
+	println("elsefor语句");
+	for(item in array){
+		println(item);
+	}elsefor{
+		println("array中没有记录");
+	}
+%>
+
+<%
+	// if else语句
+	var a = true;
+	var b = 1;
+	println("if else 语句");
+	if(a&&b==1){
+		println("a：" + a + ",b：" + b);
+	}else if(a){
+		println("a：" + a);
+	}else{
+		println("b：" + b);
+	}
+%>
+
+<%
+	// switch-case
+	// switch 变量可以支持任何类型，而不像js那样只能是整型
+	println("switch-case语句");
+	switch(b){
+		case 0:
+			println("it's 0");
+			break;
+		case 1:
+			println("it's 1");
+			break;
+		default:
+			println("error");
+	}
+%>
+
+<%
+	// select-case
+	// select-case是switch case的增强版。他允许case里有逻辑表达式，同时，也不需要每个case都break一下，默认遇到合乎条件的case执行后就退出。
+	println("select-case语句");
+	select(b){
+		case 0,1:
+			println("b is small int");
+		case 2,3:
+			println("b is big int");
+		default:
+			println("error");
+	}
+%>
+
+<%
+	select(b){// 这个里面一定需要变量
+		case b < 1,b > 10:
+			println("b < 1,b > 10");
+			break;
+		default:
+			println("error");
+	}
+%>
+
+<%
+// try-catch
+// 通常模板渲染逻辑很少用到try-catch 但考虑到渲染逻辑复杂性，以及模板也有不可控的地方，所以提供try catch，
+// 在渲染失败的时候仍然能保证输出正常
+try{
+	dosomething();// FUNCTION_NOT_FOUND
+}catch(error){
+	println("这里发生异常了？" + error);
+}
+
+try{
+	//a;//语法错误(PARSER_VIABLE_ERROR)
+}catch(error){
+	println("语法错误无法被捕获");
+}
+%>

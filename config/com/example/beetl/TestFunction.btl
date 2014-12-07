@@ -1,0 +1,12 @@
+<%
+// 函数调用
+// Beetl内置了少量实用函数，可以在Beetl任何地方调用。如下例子是调用 date 函数，不传参数情况下，返回当前日期
+var date = date();
+
+// 定义beetl的方法非常容易，有三种方法
+// a、实现Function类的call方法，并添加到配置文件里，或者显示的通过代码注册registerFunction(name,yourFunction)
+// b、可以直接调用 registerFunctionPackage(namespace,yourJavaObject),这时候yourJavaObject里的所有
+//   public方法都将注册为Beetl方法，方法名是namespace+"."+方法名
+// c、可以直接写模板文件并且以html作为后缀，放到root/functions目录下，这样此模板文件自动注册为一个函数，其函数名是该模板文件名。
+%>
+${date}

@@ -1,0 +1,8 @@
+<%
+	// 全局变量学习
+	for(user in list!){
+%>
+${user.name}
+<%
+	}
+%>

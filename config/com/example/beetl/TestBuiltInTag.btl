@@ -1,0 +1,11 @@
+<%
+layout("/com/example/beetl/layout.btl",{title:'内置标签-layout',name:'八两俊'}){
+%>
+Hello,this is main part
+
+<%
+var a = 1;
+%>
+${a}
+
+<%}%>
