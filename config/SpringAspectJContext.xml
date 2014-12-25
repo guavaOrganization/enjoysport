@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"    
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:p="http://www.springframework.org/schema/p"  
+    xmlns:aop="http://www.springframework.org/schema/aop"   
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xsi:schemaLocation="    
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd  
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!-- 
+		%%启动@AspectJ支持%%
+		强制使用CGLIB代理需要将proxy-target-class设置为true
+	-->
+	<aop:aspectj-autoproxy proxy-target-class="false"/>
+	<!-- %%如果使用DTD，但仍然可以通过一下定义来启用@AspectJ支持%%
+		<bean class="org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator"></bean>
+	-->
+	<!-- 声明自定义切面定义 -->
+	<!-- 
+		在Spring AOP中，拥有切面的类本身不可能是其它切面中通知的目标，一个类上面的@Aspect注解标识它为一个切面，并且从自动代理中排除它
+	 -->
+	<bean id="notVeryUsefulAspect" class="com.example.spring.aop.NotVeryUsefulAspect"></bean>
+</beans>
