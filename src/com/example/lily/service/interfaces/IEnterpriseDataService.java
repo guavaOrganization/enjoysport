@@ -10,5 +10,5 @@ public interface IEnterpriseDataService {
 
 	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, int matchIndex, String sourceTableName, String matchColumn) throws Exception;
 
-	public void matchingEnterpriseDataAndCreateResultWithExcel(String sourceAbsoluteFilePath, int excelMatchIndex, String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception;
+	public MatchingResultHolder matchingEnterpriseDataAndCreateResultWithExcel(String sourceAbsoluteFilePath, int excelMatchIndex, String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception;
 }

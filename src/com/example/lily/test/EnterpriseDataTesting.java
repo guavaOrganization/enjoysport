@@ -19,10 +19,8 @@ public class EnterpriseDataTesting {
 	@Test
 	public void testQueryByLegalPersonCode() {
 		try {
-			enterpriseDataService
-					.matchingEnterpriseDataAndCreateResultWithExcel(
-							"E:\\丽丽\\lily_enterprise_data_1998\\lily_enterprise_data_1998.xlsx",
-							9, "t_enterprise_data_1998", "法人代表", true, 10);
+			enterpriseDataService.matchingEnterpriseDataAndCreateResultWithExcel(
+				"E:\\丽丽\\lily_enterprise_data_1998\\lily_enterprise_data_1998.xlsx", 9, "t_enterprise_data_1998", "法人代表", true, 10);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
