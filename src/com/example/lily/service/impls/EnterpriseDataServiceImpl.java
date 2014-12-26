@@ -1,5 +1,7 @@
 package com.example.lily.service.impls;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionService;
@@ -10,6 +12,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -38,20 +41,23 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, int matchIndex, String sourceTableName, String matchColumn) throws Exception {
 		List<String> matchedHead = new ArrayList<String>();// 正确匹配结果的头部
 		List<List<String>> matchedResultList = new ArrayList<List<String>>();// 正确匹配的结果列表
-		
 		List<String> unmatchHead = new ArrayList<String>();// 未正确匹配结果的头部
 		List<List<String>> unmatchResultList = new ArrayList<List<String>>();// 未正确匹配结果列表
 
 		for (int i = startIndex; i < endIndex; i++) {
+			if(log.isInfoEnabled())
+				log.info("正在处理下标为[" + i + "]数据");
 			List<String> sourceData = sourceDatas.get(i); // 获取excel中单行数据
 			if (i == 0) { // Excel头行不进行比较
-				unmatchHead = sourceData;// 将头赋给未匹配的结果头部
+				unmatchHead.addAll(sourceData);
 				unmatchHead.add(UNMATCH_TIP);
 				continue;
 			}
 			if (StringUtils.isBlank(sourceData.get(matchIndex))) {
-				sourceData.add("Excel中的[" + sourceData.get(matchIndex)+ "]列值为空,不允许匹配");
-				unmatchResultList.add(sourceData);// 记录未匹配的行
+				List<String> tempList = new ArrayList<String>();
+				tempList.addAll(sourceData);
+				tempList.add("Excel中的[" + sourceData.get(matchIndex)+ "]列值为空,不允许匹配");
+				unmatchResultList.add(tempList);// 记录未匹配的行
 				continue;
 			}
 			// 根据Excel中的单行单列数据，匹配源表对应的列
@@ -59,15 +65,18 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			
 			// 没有匹配到的结果数据
 			if (null == queryDBResultHolder || queryDBResultHolder.getResultDatas() == null || queryDBResultHolder.getResultDatas().size() == 0) {
-				sourceData.add("使用Excel中的[" + sourceData.get(matchIndex) + "]列与MDB文件中的[" + matchColumn + "]列进行匹配，但是未匹配到结果数据");
-				unmatchResultList.add(sourceData);// 记录未匹配的行
+				List<String> tempList = new ArrayList<String>();
+				tempList.addAll(sourceData);
+				tempList.add("使用Excel中的[" + sourceData.get(matchIndex) + "]列与MDB文件中的[" + matchColumn + "]列进行匹配，但是未匹配到结果数据");
+				unmatchResultList.add(tempList);// 记录未匹配的行
 				continue;
 			}
 			
 			// 匹配到了数据
 			List<List<String>> resultDatas = queryDBResultHolder.getResultDatas();// 查询结果数据
 			for (List<String> resultData : resultDatas) {
-				List<String> tempSourceData = sourceDatas.get(i);
+				List<String> tempSourceData = new ArrayList<String>();
+				tempSourceData.addAll(sourceDatas.get(i));
 				tempSourceData.add(SPLIT_TIP);
 				tempSourceData.addAll(resultData);
 				matchedResultList.add(tempSourceData);
@@ -82,7 +91,8 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		return resultHolder;
 	}
 	
-	public MatchingResultHolder matchingEnterpriseDataAndCreateResultWithExcel(String sourceAbsoluteFilePath, int excelMatchIndex, String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception {
+	public MatchingResultHolder matchingEnterpriseDataAndCreateResultToHolder(String sourceAbsoluteFilePath, int excelMatchIndex,
+			String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception {
 		MatchingResultHolder matchingResultHolder = null;
 		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(sourceAbsoluteFilePath);// 从Excel中加载数据
 		if (null == list || list.size() == 0) {
@@ -133,10 +143,32 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 					unmatchResultList.addAll(holder.getUnmatchResultList());
 				}
 			}
+			executorService.shutdownNow();
 			matchingResultHolder = new MatchingResultHolder(matchedHead, matchedResultList, unmatchHead, unmatchResultList);
 		} else {// 单线程匹配
 			matchingResultHolder = matchingEnterpriseData(list, 0, list.size(), excelMatchIndex, sourceTableName, matchColumn);
 		}
+		if (null != list)
+			list = null;// help GC
 		return matchingResultHolder;
+	}
+	
+	public void matchingEnterpriseDataAndreateResultFileToExcel(String targetAbsoluteFilePath, String sourceAbsoluteFilePath, int excelMatchIndex,
+			String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception {
+		MatchingResultHolder holder = matchingEnterpriseDataAndCreateResultToHolder(sourceAbsoluteFilePath, excelMatchIndex, sourceTableName, matchColumn, isConcurrent, nThreads);
+		List<List<String>> matchedResultList = holder.getMatchedResultList();
+		List<List<String>> unmatchResultList = holder.getUnmatchResultList();
+		if(null == matchedResultList || null == unmatchResultList)
+			return;
+		if (null != holder.getMatchedHead())
+			matchedResultList.add(0, holder.getMatchedHead());
+		if (null != holder.getUnmatchHead())
+			unmatchResultList.add(0, holder.getUnmatchHead());
+		OutputStream os = new FileOutputStream(targetAbsoluteFilePath);
+		XSSFWorkbook wb = new XSSFWorkbook();
+		GuavaExcelUtil.writeDataToExcel(matchedResultList, "匹配到结果的数据列表", wb, os);
+		GuavaExcelUtil.writeDataToExcel(unmatchResultList, "未匹配到结果的数据列表", wb, os);
+		wb.write(os);
+		os.close();
 	}
 }

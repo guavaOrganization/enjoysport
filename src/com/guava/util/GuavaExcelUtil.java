@@ -3,17 +3,25 @@ package com.guava.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.guava.codeautogenerator.core.support.StringUtils;
 
 /**
  * 
@@ -32,7 +40,37 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class GuavaExcelUtil {
 	private transient static Log log = LogFactory.getLog(GuavaExcelUtil.class);
-
+	
+	public static void writeDataToExcel(List<List<String>> dataList, String sheetName, XSSFWorkbook wb, OutputStream os, String fileName) throws IOException {
+		if (null == os)
+			os = new FileOutputStream(fileName);
+		if (null == wb) {
+			wb = new XSSFWorkbook();
+		}
+		writeDataToExcel(dataList, sheetName, wb, os);  
+		wb.write(os);
+		os.close();// 关闭输出流  
+	}
+	
+	public static void writeDataToExcel(List<List<String>> dataList, String sheetName, XSSFWorkbook wb, OutputStream os) throws IOException {
+		if (null == wb) {
+			throw new IllegalArgumentException("XSSFWorkbook不允许为空");
+		}
+		if (null == os) {
+			throw new IllegalArgumentException("OutputStream不允许为空");
+		}
+		XSSFSheet sheet = wb.createSheet(sheetName); // 创建Sheet页
+		for (int i = 0; i < dataList.size(); i++) {
+			List<String> datas = dataList.get(i);
+			XSSFRow row = sheet.createRow(i);
+			for (int j = 0; j < datas.size(); j++) {
+				row.createCell(j).setCellValue(datas.get(j));
+			}
+		}
+	}
+	
+	
+	
 	/**
 	 * 从excel中加载所有的列，然后存放到List<List<String>>中
 	 * @since
@@ -42,6 +80,8 @@ public class GuavaExcelUtil {
 		InputStream is = null;
 		XSSFWorkbook workbook = null;
 		List<List<String>> allDatas = new ArrayList<List<String>>();
+		DecimalFormat df = new DecimalFormat("0"); 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 		try {
 			long now = System.currentTimeMillis();
 			is = new FileInputStream(new File(absolutePath));
@@ -52,7 +92,21 @@ public class GuavaExcelUtil {
 				List<String> rows = new ArrayList<String>();
 				for (int j = xssfRow.getFirstCellNum(); j < xssfRow.getPhysicalNumberOfCells(); j++) {// 迭代列
 					XSSFCell xssfCell = xssfRow.getCell(j);
-					rows.add(null == xssfCell ? "" : xssfCell.toString());
+					if (null == xssfCell) {
+						rows.add(StringUtils.EMPTY);
+						continue;
+					}
+					if (Cell.CELL_TYPE_NUMERIC == xssfCell.getCellType()) {// 数字 和 时间
+						if(HSSFDateUtil.isCellDateFormatted(xssfCell)) {// 时间
+							rows.add(sdf.format(xssfCell.getDateCellValue()));
+						}else{
+							rows.add(df.format(xssfCell.getNumericCellValue()));
+						}
+					} else if (Cell.CELL_TYPE_BOOLEAN == xssfCell.getCellType()) {// Blooean类型
+						rows.add(xssfCell.getBooleanCellValue() + "");
+					} else {
+						rows.add(xssfCell.toString());
+					}
 				}
 				allDatas.add(rows);
 			}
