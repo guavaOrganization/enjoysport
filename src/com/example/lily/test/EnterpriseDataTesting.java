@@ -1,5 +1,8 @@
 package com.example.lily.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -24,10 +27,19 @@ public class EnterpriseDataTesting {
 	public void testQueryByLegalPersonCode() {
 		try {
 			long now = System.currentTimeMillis();
+			List<Integer> matchIndexs = new ArrayList<Integer>();
+			matchIndexs.add(9);
+			matchIndexs.add(10);
+			
+			List<String> matchColumns = new ArrayList<String>();
+			matchColumns.add("法人代码");
+			matchColumns.add("企业名称");
+			
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
-							"E:\\丽丽\\lily_enterprise_data_1998\\98年企业财务_匹配结果.xlsx",
-							"E:\\丽丽\\lily_enterprise_data_1998\\lily_enterprise_data_1998.xlsx", 
-							9, "t_enterprise_data_1998", "法人代码", true, 10);
+							"E:\\丽丽\\企业财务数据整理\\1998\\1998年企业财务数据整理结果.xlsx",
+							"E:\\丽丽\\企业财务数据整理\\lily_enterprise_company.xlsx", 
+							matchIndexs, "t_enterprise_data_1998", matchColumns, false, 10);
+			
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));
 		} catch (Exception e) {

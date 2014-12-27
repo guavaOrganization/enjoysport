@@ -10,25 +10,25 @@ public class MatchingEnterpriseDataCallable implements
 	List<List<String>> sourceDatas;
 	int startIndex;
 	int endIndex;
-	int matchIndex;
+	List<Integer> matchIndexs;
 	String sourceTableName;
-	String matchColumn;
+	List<String> matchColumns;
 	IEnterpriseDataService enterpriseDataService;
 
 	public MatchingEnterpriseDataCallable() {
 	}
 
 	public MatchingEnterpriseDataCallable(List<List<String>> sourceDatas,
-			int startIndex, int endIndex, int matchIndex,
-			String sourceTableName, String matchColumn,
+			int startIndex, int endIndex, List<Integer>  matchIndexs,
+			String sourceTableName, List<String> matchColumns,
 			IEnterpriseDataService enterpriseDataService) {
 		super();
 		this.sourceDatas = sourceDatas;
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
-		this.matchIndex = matchIndex;
+		this.matchIndexs = matchIndexs;
 		this.sourceTableName = sourceTableName;
-		this.matchColumn = matchColumn;
+		this.matchColumns = matchColumns;
 		this.enterpriseDataService = enterpriseDataService;
 	}
 
@@ -36,7 +36,6 @@ public class MatchingEnterpriseDataCallable implements
 
 	@Override
 	public MatchingResultHolder call() throws Exception {
-		return enterpriseDataService.matchingEnterpriseData(sourceDatas,
-				startIndex, endIndex, matchIndex, sourceTableName, matchColumn);
+		return enterpriseDataService.matchingEnterpriseData(sourceDatas, startIndex, endIndex, matchIndexs, sourceTableName, matchColumns);
 	}
 }

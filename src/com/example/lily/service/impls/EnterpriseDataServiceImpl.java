@@ -38,12 +38,20 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		return enterpriseDataDAO.queryEnterpriseData(tableName, matchColumn, matchValue);
 	}
 	
-	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, int matchIndex, String sourceTableName, String matchColumn) throws Exception {
+	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns) throws Exception {
+		if(null == matchIndexs || matchIndexs.size() == 0){
+			throw new IllegalArgumentException("参数[matchIndex]不能为空");
+		}
+		if(null == matchColumns || matchColumns.size() == 0){
+			throw new IllegalArgumentException("参数[matchColumns]不能为空");
+		}
+		if (matchIndexs.size() != matchColumns.size()) {
+			throw new IllegalArgumentException("参数[matchIndexs]与参数[matchColumns]长度不等");
+		}
 		List<String> matchedHead = new ArrayList<String>();// 正确匹配结果的头部
 		List<List<String>> matchedResultList = new ArrayList<List<String>>();// 正确匹配的结果列表
 		List<String> unmatchHead = new ArrayList<String>();// 未正确匹配结果的头部
 		List<List<String>> unmatchResultList = new ArrayList<List<String>>();// 未正确匹配结果列表
-		String matchColumnName = sourceDatas != null && sourceDatas.size() > 0 ? sourceDatas.get(0).get(matchIndex) : StringUtils.EMPTY;
 		for (int i = startIndex; i < endIndex; i++) {
 			if(log.isInfoEnabled())
 				log.info("正在处理下标为[" + i + "]数据");
@@ -53,21 +61,27 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				unmatchHead.add(UNMATCH_TIP);
 				continue;
 			}
-			if (StringUtils.isBlank(sourceData.get(matchIndex))) {
-				List<String> tempList = new ArrayList<String>();
-				tempList.addAll(sourceData);
-				tempList.add("Excel中的[" + sourceData.get(matchIndex)+ "]列值为空,不允许匹配");
-				unmatchResultList.add(tempList);// 记录未匹配的行
-				continue;
-			}
-			// 根据Excel中的单行单列数据，匹配源表对应的列
-			QueryDBResultHolder queryDBResultHolder = queryEnterpriseData(sourceTableName, matchColumn, sourceData.get(matchIndex).trim());
+			
+			QueryDBResultHolder queryDBResultHolder = null;
+			int matchIndex = -1;
+			String matchedColumnNameStr = StringUtils.EMPTY; 
+			do {
+				matchIndex++;
+				// 根据Excel中的单行单列数据，匹配源表对应的列
+				if (matchIndex + 1 != matchIndexs.size()) {
+					matchedColumnNameStr += matchColumns.get(matchIndex) + ",";
+				} else {
+					matchedColumnNameStr += matchColumns.get(matchIndex);
+				}
+				queryDBResultHolder = queryEnterpriseData(sourceTableName, matchColumns.get(matchIndex), sourceData.get(matchIndexs.get(matchIndex)).trim());
+			} while ((matchIndex + 1 < matchColumns.size())
+					&& (queryDBResultHolder == null || queryDBResultHolder.getResultDatas() == null || queryDBResultHolder.getResultDatas().size() == 0));
 			
 			// 没有匹配到的结果数据
 			if (null == queryDBResultHolder || queryDBResultHolder.getResultDatas() == null || queryDBResultHolder.getResultDatas().size() == 0) {
 				List<String> tempList = new ArrayList<String>();
 				tempList.addAll(sourceData);
-				tempList.add("使用Excel中的[" + matchColumnName + "]列，值为[" + sourceData.get(matchIndex) + "]与MDB文件中的[" + matchColumn + "]列进行匹配，但是未匹配到结果数据");
+				tempList.add("尝试匹配MDB文件中的[" + matchedColumnNameStr + "]，都未能匹配到数据");
 				unmatchResultList.add(tempList);// 记录未匹配的行
 				continue;
 			}
@@ -91,8 +105,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		return resultHolder;
 	}
 	
-	public MatchingResultHolder matchingEnterpriseDataAndCreateResultToHolder(String sourceAbsoluteFilePath, int excelMatchIndex,
-			String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception {
+	public MatchingResultHolder matchingEnterpriseDataAndCreateResultToHolder(String sourceAbsoluteFilePath, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns, boolean isConcurrent, int nThreads) throws Exception {
 		MatchingResultHolder matchingResultHolder = null;
 		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(sourceAbsoluteFilePath);// 从Excel中加载数据
 		if (null == list || list.size() == 0) {
@@ -124,7 +137,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				if(log.isInfoEnabled()){
 					log.info("比对的开始下标为："+start + ", 结束下标下标为：" + end);
 				}
-				resultHolders.add(completionService.submit(new MatchingEnterpriseDataCallable(list, start, end, excelMatchIndex, sourceTableName, matchColumn, this)));
+				resultHolders.add(completionService.submit(new MatchingEnterpriseDataCallable(list, start, end, matchIndexs, sourceTableName, matchColumns, this)));
 			}
 			for (Future<MatchingResultHolder> future : resultHolders) {
 				MatchingResultHolder holder = future.get();
@@ -146,16 +159,15 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			executorService.shutdownNow();
 			matchingResultHolder = new MatchingResultHolder(matchedHead, matchedResultList, unmatchHead, unmatchResultList);
 		} else {// 单线程匹配
-			matchingResultHolder = matchingEnterpriseData(list, 0, list.size(), excelMatchIndex, sourceTableName, matchColumn);
+			matchingResultHolder = matchingEnterpriseData(list, 0, list.size(), matchIndexs, sourceTableName, matchColumns);
 		}
 		if (null != list)
 			list = null;// help GC
 		return matchingResultHolder;
 	}
 	
-	public void matchingEnterpriseDataAndreateResultFileToExcel(String targetAbsoluteFilePath, String sourceAbsoluteFilePath, int excelMatchIndex,
-			String sourceTableName, String matchColumn, boolean isConcurrent, int nThreads) throws Exception {
-		MatchingResultHolder holder = matchingEnterpriseDataAndCreateResultToHolder(sourceAbsoluteFilePath, excelMatchIndex, sourceTableName, matchColumn, isConcurrent, nThreads);
+	public void matchingEnterpriseDataAndreateResultFileToExcel(String targetAbsoluteFilePath, String sourceAbsoluteFilePath, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns, boolean isConcurrent, int nThreads) throws Exception {
+		MatchingResultHolder holder = matchingEnterpriseDataAndCreateResultToHolder(sourceAbsoluteFilePath, matchIndexs, sourceTableName, matchColumns, isConcurrent, nThreads);
 		List<List<String>> matchedResultList = holder.getMatchedResultList();
 		List<List<String>> unmatchResultList = holder.getUnmatchResultList();
 		if(null == matchedResultList || null == unmatchResultList)
