@@ -87,10 +87,10 @@ public class GuavaExcelUtil {
 			is = new FileInputStream(new File(absolutePath));
 			workbook = new XSSFWorkbook(is);
 			XSSFSheet sheet = workbook.getSheetAt(0);// 读取第一个sheet页数据
-			for (int i = sheet.getFirstRowNum(); i < sheet.getPhysicalNumberOfRows(); i++) { // 迭代行
+			for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) { // 迭代行
 				XSSFRow xssfRow = sheet.getRow(i);
 				List<String> rows = new ArrayList<String>();
-				for (int j = xssfRow.getFirstCellNum(); j < xssfRow.getPhysicalNumberOfCells(); j++) {// 迭代列
+				for (int j = xssfRow.getFirstCellNum(); j < xssfRow.getLastCellNum(); j++) {// 迭代列
 					XSSFCell xssfCell = xssfRow.getCell(j);
 					if (null == xssfCell) {
 						rows.add(StringUtils.EMPTY);

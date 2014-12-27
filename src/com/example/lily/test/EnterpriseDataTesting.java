@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.example.lily.javabeans.MatchingResultHolder;
 import com.example.lily.service.interfaces.IEnterpriseDataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,7 +25,9 @@ public class EnterpriseDataTesting {
 		try {
 			long now = System.currentTimeMillis();
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
-					"E:\\丽丽\\lily_enterprise_data_1998\\98年匹配结果.xlsx","E:\\丽丽\\lily_enterprise_data_1998\\lily_enterprise_data_1998.xlsx", 9, "t_enterprise_data_1998", "法人代码", true, 10);
+							"E:\\丽丽\\lily_enterprise_data_1998\\98年企业财务_匹配结果.xlsx",
+							"E:\\丽丽\\lily_enterprise_data_1998\\lily_enterprise_data_1998.xlsx", 
+							9, "t_enterprise_data_1998", "法人代码", true, 10);
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));
 		} catch (Exception e) {

@@ -43,7 +43,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		List<List<String>> matchedResultList = new ArrayList<List<String>>();// 正确匹配的结果列表
 		List<String> unmatchHead = new ArrayList<String>();// 未正确匹配结果的头部
 		List<List<String>> unmatchResultList = new ArrayList<List<String>>();// 未正确匹配结果列表
-
+		String matchColumnName = sourceDatas != null && sourceDatas.size() > 0 ? sourceDatas.get(0).get(matchIndex) : StringUtils.EMPTY;
 		for (int i = startIndex; i < endIndex; i++) {
 			if(log.isInfoEnabled())
 				log.info("正在处理下标为[" + i + "]数据");
@@ -67,7 +67,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			if (null == queryDBResultHolder || queryDBResultHolder.getResultDatas() == null || queryDBResultHolder.getResultDatas().size() == 0) {
 				List<String> tempList = new ArrayList<String>();
 				tempList.addAll(sourceData);
-				tempList.add("使用Excel中的[" + sourceData.get(matchIndex) + "]列与MDB文件中的[" + matchColumn + "]列进行匹配，但是未匹配到结果数据");
+				tempList.add("使用Excel中的[" + matchColumnName + "]列，值为[" + sourceData.get(matchIndex) + "]与MDB文件中的[" + matchColumn + "]列进行匹配，但是未匹配到结果数据");
 				unmatchResultList.add(tempList);// 记录未匹配的行
 				continue;
 			}
@@ -76,7 +76,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			List<List<String>> resultDatas = queryDBResultHolder.getResultDatas();// 查询结果数据
 			for (List<String> resultData : resultDatas) {
 				List<String> tempSourceData = new ArrayList<String>();
-				tempSourceData.addAll(sourceDatas.get(i));
+				tempSourceData.addAll(sourceData);
 				tempSourceData.add(SPLIT_TIP);
 				tempSourceData.addAll(resultData);
 				matchedResultList.add(tempSourceData);
