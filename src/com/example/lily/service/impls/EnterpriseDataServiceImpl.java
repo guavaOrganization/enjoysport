@@ -327,7 +327,11 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			log.info("未匹配到结果的数据列表~~~~~共有~~~~~~" + unmatchResultList.size() + "~~~~~行数据");
 		}
 		GuavaExcelUtil.writeDataToExcel(matchedResultList, "匹配到结果的数据列表", wb, os);
+		if(matchedResultList != null)
+			matchedResultList = null;// Help GC
 		GuavaExcelUtil.writeDataToExcel(unmatchResultList, "未匹配到结果的数据列表", wb, os);
+		if(unmatchResultList != null)
+			unmatchResultList = null;// Help GC
 		wb.write(os);
 		os.close();
 	}

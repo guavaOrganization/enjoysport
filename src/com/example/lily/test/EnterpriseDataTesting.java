@@ -74,7 +74,7 @@ public class EnterpriseDataTesting {
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
 							"E:\\丽丽\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果.xlsx",
 							"E:\\丽丽\\企业财务数据整理\\lily_enterprise_company_bak.xlsx", 
-							matchIndexs, "t_enterprise_data_" + year, matchColumns, true, 5);
+							matchIndexs, "t_enterprise_data_" + year, matchColumns, true, 10);
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));
 		} catch (Exception e) {
