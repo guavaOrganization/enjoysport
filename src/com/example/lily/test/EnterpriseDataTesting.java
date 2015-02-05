@@ -31,20 +31,19 @@ public class EnterpriseDataTesting {
 	public void testRepairListData(){
 		try {
 			List<Integer> matchIndexs = new ArrayList<Integer>();
-			matchIndexs.add(10);
-			matchIndexs.add(11);
-			matchIndexs.add(12);
+			matchIndexs.add(4);
+			matchIndexs.add(5);
+			matchIndexs.add(6);
 			
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
 			matchColumns.add("法人单位");
 			matchColumns.add("法人代表");
 	
-			List<List<String>> excelDatas = GuavaExcelUtil.loadExcelDataToList("E:\\丽丽\\企业财务数据整理\\lily_enterprise_company.xlsx");
-			// 4993 
-			List<List<String>> repairedList = enterpriseDataService.repairListData(excelDatas, 4993, 10000, 10, 1, matchIndexs, "t_enterprise_data_2007", matchColumns);
+			List<List<String>> excelDatas = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊续集.xlsx");
+			List<List<String>> repairedList = enterpriseDataService.repairListData(excelDatas, 2, 10000, 4, 1, matchIndexs, "t_enterprise_data_2007", matchColumns);
 		
-			OutputStream os = new FileOutputStream("E:\\丽丽\\企业财务数据整理\\lily_enterprise_company_repaired_data.xlsx");
+			OutputStream os = new FileOutputStream("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\lily_enterprise_company_repaired_data.xlsx");
 			XSSFWorkbook wb = new XSSFWorkbook();
 			GuavaExcelUtil.writeDataToExcel(repairedList, "修补结果数据", wb, os);
 			
@@ -60,20 +59,20 @@ public class EnterpriseDataTesting {
 		try {
 			long now = System.currentTimeMillis();
 			List<Integer> matchIndexs = new ArrayList<Integer>();
-			matchIndexs.add(10);
-			matchIndexs.add(11);
-			matchIndexs.add(12);
+			matchIndexs.add(4);
+			matchIndexs.add(5);
+			matchIndexs.add(6);
 			
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
 			matchColumns.add("企业名称");
 			matchColumns.add("法人代表姓名");
 			
-			String year = "1998";
-			
+			String year = "1999";
+			 String seqFlag = "_3";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
-							"E:\\丽丽\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果.xlsx",
-							"E:\\丽丽\\企业财务数据整理\\lily_enterprise_company_bak.xlsx", 
+							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果" + seqFlag + ".xlsx",
+							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\lily_enterprise_company_bak" + seqFlag + ".xlsx",
 							matchIndexs, "t_enterprise_data_" + year, matchColumns, true, 10);
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));

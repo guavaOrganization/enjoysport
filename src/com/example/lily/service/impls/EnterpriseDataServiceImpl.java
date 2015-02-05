@@ -183,80 +183,87 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				log.info("sourceAbsoluteFilePath中没有数据,无需匹配");
 			return null;
 		}
-		
-		// 需要翻译的列
-		List<Integer> needToBeTranslatedIndexs = new ArrayList<Integer>();
-		needToBeTranslatedIndexs.add(3);
-		needToBeTranslatedIndexs.add(3);
-		needToBeTranslatedIndexs.add(14);
-		
-		for (int i = 0; i < matchIndexs.size(); i++) {
-			int matchIndex = matchIndexs.get(i);
-			for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
-				int needToBeTranslatedIndex = needToBeTranslatedIndexs.get(j);
-				if(needToBeTranslatedIndex < matchIndex){
-					++matchIndex;
-				}
-			}
-			matchIndexs.set(i, matchIndex);
-		}
-		
-		// 需要翻译的列
-		for (int i = 0; null != list && i < list.size(); i++) {
-			List<String> data = list.get(i);
-			List<String> translateResults = new ArrayList<String>();
+		boolean need = true;
+		if(need){
+			// 需要翻译的列
+			List<Integer> needToBeTranslatedIndexs = new ArrayList<Integer>();
+			needToBeTranslatedIndexs.add(8);
+//			needToBeTranslatedIndexs.add(3);
+//			needToBeTranslatedIndexs.add(14);
 			
-			// 迭代 需要翻译的列，对字段进行翻译
-			for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
-				// 翻译字段 Start
-				int needToBeTranslatedIndex = needToBeTranslatedIndexs.get(j) - 1;
-				if (i == 0 && j == 0) {
-					translateResults.add("是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
-					continue;
+			for (int i = 0; i < matchIndexs.size(); i++) {
+				int matchIndex = matchIndexs.get(i);
+				for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
+					int needToBeTranslatedIndex = needToBeTranslatedIndexs.get(j);
+					if(needToBeTranslatedIndex < matchIndex){
+						++matchIndex;
+					}
 				}
-				if (i == 0 && j == 1) {
-					translateResults.add("是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
-					continue;
-				}
-				if (i == 0 && j == 2) {
-					translateResults.add("是否为我国东部地区(1:东部地区;0:非东部地区)");
-					continue;
+				matchIndexs.set(i, matchIndex);
+			}
+			
+			// 需要翻译的列
+			for (int i = 0; null != list && i < list.size(); i++) {
+				List<String> data = list.get(i);
+				List<String> translateResults = new ArrayList<String>();
+				
+				// 迭代 需要翻译的列，对字段进行翻译
+				for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
+					// 翻译字段 Start
+					int needToBeTranslatedIndex = needToBeTranslatedIndexs.get(j) - 1;
+					/**
+					if (i == 0 && j == 0) {
+						translateResults.add("是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
+						continue;
+					}
+					if (i == 0 && j == 1) {
+						translateResults.add("是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
+						continue;
+					}
+					// if (i == 0 && j == 2) {
+					*/
+					if (i == 0 && j == 0) {
+						translateResults.add("是否为我国东部地区(1:东部地区;0:非东部地区)");
+						continue;
+					}
+					
+					String tempData = data.get(needToBeTranslatedIndex) == null ? "" : data.get(needToBeTranslatedIndex).trim();
+					/**
+					if (j == 0) {
+						if (ASIA_COUNTRY.indexOf(tempData) >= 0) { // 是否为亚洲国家
+							translateResults.add("1");
+						} else {
+							translateResults.add("0");
+						}
+						continue;
+					} 
+					if (j == 1) {
+						if (DEVELOPED_COUNTRY.indexOf(tempData) >= 0) { // 是否为高收入国家
+							translateResults.add("1");
+						} else {
+							translateResults.add("0");
+						}
+						continue;
+					} 
+					if (j == 2) {
+					*/
+					if (j == 0) {
+						if (EAST_AREA.indexOf(tempData) >= 0) { // 是否为我国东部地区
+							translateResults.add("1");
+						} else {
+							translateResults.add("0");
+						}
+						continue;
+					} 
+					// 翻译字段 End
 				}
 				
-				String tempData = data.get(needToBeTranslatedIndex) == null ? "" : data.get(needToBeTranslatedIndex).trim();
-				if (j == 0) {
-					if (ASIA_COUNTRY.indexOf(tempData) >= 0) { // 是否为亚洲国家
-						translateResults.add("1");
-					} else {
-						translateResults.add("0");
-					}
-					continue;
-				} 
-				if (j == 1) {
-					if (DEVELOPED_COUNTRY.indexOf(tempData) >= 0) { // 是否为高收入国家
-						translateResults.add("1");
-					} else {
-						translateResults.add("0");
-					}
-					continue;
-				} 
-				if (j == 2) {
-					if (EAST_AREA.indexOf(tempData) >= 0) { // 是否为我国东部地区
-						translateResults.add("1");
-					} else {
-						translateResults.add("0");
-					}
-					continue;
-				} 
-				// 翻译字段 End
-			}
-			
-			// 添加加到data行中
-			for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
-				data.add((needToBeTranslatedIndexs.get(j) + j), translateResults.get(j));
+				// 添加加到data行中
+				for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
+					data.add((needToBeTranslatedIndexs.get(j) + j), translateResults.get(j));
+				}
 			}
 		}
-		
 		if (isConcurrent) {// 并行匹配
 			if (nThreads <= 0 || nThreads > 10) { // 默认是个线程
 				nThreads = 10;
