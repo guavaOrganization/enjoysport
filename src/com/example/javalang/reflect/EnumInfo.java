@@ -1,8 +1,8 @@
-package com.example.javalang;
+package com.example.javalang.reflect;
 
-public enum MyEnum {
+public enum EnumInfo {
 	PING, SET, GET, QUIT, EXISTS;
-	MyEnum() {
+	EnumInfo() {
 		System.out.println("MyEnum");
 	}
 	
