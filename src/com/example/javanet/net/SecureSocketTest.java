@@ -17,7 +17,7 @@ public class SecureSocketTest {
 		SSLSocket socket = null;
 		try {
 			SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			socket = (SSLSocket)factory.createSocket("www.usps.com", 443);
+			socket = (SSLSocket)factory.createSocket("127.0.0.1", 1223);
 			// SSL常用于Web服务器，而且有很好的理由。Web连接一般是暂时的，每个页面需要单独的Socket。
 			// 例如，在Amazon.com的安全服务器上结账需要加载7个单独的页面，如果要编辑地址或选择礼品包装，加载的页面还会更多。
 			// 想象以下，如果每个页面都要多花10秒钟或更多的时间来协商一个安全连接，会出现什么情况，两台主机之间为简历安全通信需要完成握手，由于这个握手过程有很大的开销，SSL允许简历扩展到
@@ -41,7 +41,7 @@ public class SecureSocketTest {
 			
 			// setUseClientMode()方法确定Socket是否需要在第一次握手时使用认证。这个方法名有些误导性。
 			// 客户端和服务器端Socket都可以使用这个方法。不过，传入true时，它表示Socket处于客户端模式(无论是否在客户端上)，因此不会提供自行认证。传入false时，则会尝试自行认证：
-			socket.setUseClientMode(false); // 这个属性对于任何指定Socket只能设置一次。视图第二次设置会抛出一个IllegalArgumentException异常。
+			// socket.setUseClientMode(false); // 这个属性对于任何指定Socket只能设置一次。视图第二次设置会抛出一个IllegalArgumentException异常。
 			
 			// HandshakeCompletedListener : 任何希望接收有关给定 SSL 连接上 SSL 协议握手结束通知的类实现此接口。
 			// 当 SSL 握手结束时，新安全参数将会建立。这些参数始终包括用来保护报文的安全密钥。它们也可能包括和新会话 相关联的参数，例如经过验证的同位体标识和新的 SSL 密码套件。
@@ -70,8 +70,9 @@ public class SecureSocketTest {
 			}
 			
 			Writer writer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
-			writer.write("GET http://www.usps.com/ HTTP/1.1\r\n");
-			writer.write("Host: www.usps.com\r\n");
+			// writer.write("GET http://127.0.0.1/ HTTP/1.1\r\n");
+			// writer.write("Host: www.usps.com\r\n");
+			writer.write("你好!");
 			writer.write("\r\n");
 			writer.flush();
 			
