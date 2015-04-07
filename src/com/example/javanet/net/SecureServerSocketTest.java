@@ -49,7 +49,7 @@ public class SecureServerSocketTest {
 			//TLSv1.1	Supports RFC 4346: TLS version 1.1 ; may support other versions
 			SSLContext context = SSLContext.getInstance(ALGORITHM);
 			
-			// 参考实现只支持X.509密钥
+			// 参考实现只支持X.509证书
 			// 此类充当基于密钥内容源的密钥管理器的工厂。每个密钥管理器管理特定类型的、由安全套接字所使用的密钥内容。密钥内容是基于 KeyStore 和/或提供者特定的源。
 			// 内部采用委派模式，见#KeyManagerFactorySpi
 			// 算法有：PKIX, SunX509
@@ -58,13 +58,11 @@ public class SecureServerSocketTest {
 			// 安全属性(在Java安全属性文件或通过调用 Security.setProperty(java.lang.String, java.lang.String)来设置)的值设置为所需的算法名称
 			// System.out.println(kmf.getDefaultAlgorithm());
 			
-			
-			// Oracle的默认密钥库类型
 			// KeyStore表示密钥和证书的存储设施。
 			// jceks	The proprietary keystore implementation provided by the SunJCE provider.
 			// jks		The proprietary keystore implementation provided by the SUN provider.
 			// pkcs12	The transfer syntax for personal identity information as defined in PKCS #12.
-			KeyStore ks = KeyStore.getInstance("JKS");
+			KeyStore ks = KeyStore.getInstance("JKS");// Oracle的默认密钥库类型
 			// 处于安全考虑，每个密钥库都必须用口令短语加密，在从磁盘加载前必须提供这个扣了。
 			// 口令短语以char[]数组形式存储，所以可以很快地从内存中擦除，而不是等待垃圾回收
 			char[] password = "coolguava0792".toCharArray();

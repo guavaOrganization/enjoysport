@@ -2,6 +2,9 @@ package com.example.javalang.reflect;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import org.junit.Test;
 
@@ -23,6 +26,18 @@ import org.junit.Test;
  * @since
  */
 public class ClassTest {
+	
+	public void test_type() {
+		// 向Class引用添加泛型语法的原因仅仅是为了提供编译期类型检查，因此如果你操作有误，稍后立即就会发现一点.
+		Class<? extends Number> bounded = int.class;
+		bounded = Integer.class;
+		bounded = Number.class;
+		bounded = Double.class;
+		
+		Class<Integer> inte = int.class;
+		// inte = double.class;//编译失败
+	}
+	
 	// @Test
 	public void test_toString() {
 		System.out.println(ClassInfo.class.toString());// 类
@@ -145,9 +160,23 @@ public class ClassTest {
 	 * @since
 	 * @throws
 	 */
-	@Test
-	public void getClassLoader() {
+	// @Test
+	public void test_getClassLoader() {
 		// sun.misc.Launcher$AppClassLoader@157c2bd --> 应用类加载器，加载classpath下面的字节码文件
 		System.out.println(this.getClass().getClassLoader());
+	}
+	
+	@Test
+	public void test_getTypeParameters() {
+		try {
+			Class classInfo = Class.forName("com.example.javalang.reflect.InterfaceClassInfo");
+			System.out.println(classInfo);
+			TypeVariable<?>[] variables = classInfo.getTypeParameters();
+			for (TypeVariable<?> type : variables) {
+				System.out.println(type.getName());
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }

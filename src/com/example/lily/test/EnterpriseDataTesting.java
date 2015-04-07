@@ -1,6 +1,8 @@
 package com.example.lily.test;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,8 +40,8 @@ public class EnterpriseDataTesting {
 	@Qualifier("com.example.lily.service.impls.EnterpriseDataServiceImpl")
 	IEnterpriseDataService enterpriseDataService;
 
-//	@Test
-	public void testRepairListData(){
+	// @Test
+	public void testRepairListData() {
 		try {
 			List<Integer> matchIndexs = new ArrayList<Integer>();
 			matchIndexs.add(10);
@@ -66,7 +68,7 @@ public class EnterpriseDataTesting {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void testQueryByLegalPersonCode() {
 		try {
 			long now = System.currentTimeMillis();
@@ -77,14 +79,14 @@ public class EnterpriseDataTesting {
 			
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
-			matchColumns.add("企业名称");
-			matchColumns.add("法人代表姓名");
+			matchColumns.add("法人单位");
+			matchColumns.add("法人");
 			
-			String year = "1999";
-			String seqFlag = "_3";
+			String year = "2000";
+			String seqFlag = "_续集";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
 							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果" + seqFlag + ".xlsx",
-							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\lily_enterprise_company_bak" + seqFlag + ".xlsx",
+							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊续集_修复后的数据.xlsx",
 							matchIndexs, "t_enterprise_data_" + year, matchColumns, true, 10);
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));
@@ -103,13 +105,14 @@ public class EnterpriseDataTesting {
 	}
 	 
 	public void k() throws Exception { // 找出投资行业数据
-		String yyyy = "2007";
+		String yyyy = "1998";
 		String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\非对外投资企业数据匹配\\" + yyyy + ".xlsx";
 		// 初始化相关数据 start
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		SimpleDateFormat secondFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat thirdFormat = new SimpleDateFormat("yyyy");
 		Map<String, String> map = new HashMap<String, String>();
+		map.put("1998", "行业类别");
 		map.put("1999", "行业类别");
 		map.put("2000", "行业类别");
 		map.put("2001", "行业类别");
@@ -250,7 +253,7 @@ public class EnterpriseDataTesting {
 		os.close();
 	}
 	
-	@Test
+	// @Test
 	public void lookRepetitiveData() {
 		try {
 			Set<String> set = new HashSet<String>();
@@ -339,6 +342,72 @@ public class EnterpriseDataTesting {
 			wb.write(os);
 			os.close();
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+//	@Test
+	public void comp() {
+		// 根据excel表格中的"Country"和"Acquiror name"去重。
+		// 统计去重后的列表数据中"Acquiror name"的个数
+		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\非对外投资企业数据匹配\\多国投资数据比对.xlsx");
+		Set<String> set = new HashSet<String>();
+		Set<String> reSet = new HashSet<String>();
+
+		for (int i = 0; null != list && i < list.size(); i++) {
+			if (i == 0)
+				continue;
+			List<String> row = list.get(i);
+			if (!set.add(row.get(2).trim() + "," + row.get(3).trim())) { // 已经在set中存在的数据表示重复数据
+				reSet.add(row.get(2).trim() + "," + row.get(3).trim());
+			}
+		}
+		
+		Set<String> compSet = new HashSet<String>();
+		Set<String> sigleCompSet = new HashSet<String>();
+
+		List<List<String>> reslut = new ArrayList<List<String>>();
+		
+		List<List<String>> sigleReslut = new ArrayList<List<String>>();
+
+		for (int i = 0; null != list && i < list.size(); i++) {
+			if (i == 0){
+				reslut.add(list.get(i));
+				sigleReslut.add(list.get(i));
+				continue;
+			}
+			List<String> row = list.get(i);
+			
+			if (reSet.contains(row.get(2).trim() + "," + row.get(3).trim())) { // 去重
+				sigleReslut.add(row);
+				sigleCompSet.add(row.get(3).trim());
+			} else {
+				reslut.add(row);
+				compSet.add(row.get(3).trim());
+			}
+		}
+		
+		System.out.println("多国投资公司总共：" + compSet.size() + "个");
+		System.out.println("单国N连投资公司总共：" + sigleCompSet.size()+ "个");
+		
+		try {
+			OutputStream os;
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\非对外投资企业数据匹配\\多国投资数据比对最终结果final.xlsx";
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			GuavaExcelUtil.writeDataToExcel(reslut, "多国投资", wb, os);
+			if(reslut != null)
+				reslut = null;// Help GC
+			
+			GuavaExcelUtil.writeDataToExcel(sigleReslut, "单国N连投资", wb, os);
+			if(sigleReslut != null)
+				sigleReslut = null;// Help GC
+			wb.write(os);
+			os.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
