@@ -1,4 +1,4 @@
-package com.example.javalang.reflect;
+package com.example.javalang.reflect.proxy;
 
 public class ProxyClass implements ProxyInterface {
 	public void sayHello() {
