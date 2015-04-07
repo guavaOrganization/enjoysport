@@ -1,6 +1,8 @@
 package com.example.javalang.reflect;
 
-public class ClassInfo implements InterfaceInfo {
+import java.util.Date;
+
+public class ClassInfo extends SuperClassInfo<String> implements InterfaceClassInfo<Date>, InterfaceInfo {
 	static {
 		System.out.println("static block...");
 	}
