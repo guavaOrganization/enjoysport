@@ -13,6 +13,16 @@ import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 
+ * @Copyright (c) 2011-2014 guava(番石榴工作室)
+ * <p>
+ * 	多路复用器类
+ * </p>
+ * 
+ * @author 八两俊 
+ * @since
+ */
 public class MultiplexerTimeServer implements Runnable {
 	private Selector selector;
 	// 针对面向流的侦听套接字的可选择通道。
@@ -91,6 +101,7 @@ public class MultiplexerTimeServer implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		// 多路复用器关闭后，所有注册在上面的channel和pipe等资源都会被自动去注册并关闭，所以不需要重复释放资源
 		if (selector != null) {
 			try {
 				selector.close();// 通过选择器的close方法关闭选择器之前，它一直保持打开状态。

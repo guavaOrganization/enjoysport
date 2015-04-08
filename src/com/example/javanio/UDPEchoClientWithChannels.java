@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.Iterator;
 import java.util.Set;
 
 public class UDPEchoClientWithChannels {
@@ -20,7 +21,7 @@ public class UDPEchoClientWithChannels {
 			return;
 		}
 
-		try (DatagramChannel channel = DatagramChannel.open()){
+		try (DatagramChannel channel = DatagramChannel.open()) {
 			channel.configureBlocking(false);
 			channel.connect(remote);
 			
@@ -38,9 +39,39 @@ public class UDPEchoClientWithChannels {
 				Set<SelectionKey> keys = selector.selectedKeys();
 				if (keys.isEmpty() && n == LIMIT)
 					break;
+				else {
+					Iterator<SelectionKey> it = keys.iterator();
+					while (it.hasNext()) {
+						SelectionKey key = (SelectionKey) it.next();
+						it.remove();
+						if (key.isReadable()) {
+							buffer.clear();
+							channel.read(buffer);
+							buffer.flip();
+							int echo = buffer.getInt();
+							System.out.println("Read: " + echo);
+							numbersRead++;
+						} 
+						
+						if (key.isWritable()) {
+							buffer.clear();
+							buffer.putInt(n);
+							buffer.flip();
+							channel.write(buffer);
+							System.out.println("Write: " + n);
+							n++;
+							if (n == LIMIT) {
+								key.interestOps(SelectionKey.OP_READ);// 所有包已写入，切换到只读模式
+							}
+						}
+					}
+				}
 			}
+			
+			System.out.println("Echoed " + numbersRead + " out of " + LIMIT + " sent");
+			System.out.println("Success rate: " + 100.0 * numbersRead / LIMIT + "%");
 		} catch (IOException e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 }

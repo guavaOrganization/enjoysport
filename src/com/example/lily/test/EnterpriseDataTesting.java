@@ -79,10 +79,10 @@ public class EnterpriseDataTesting {
 			
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
-			matchColumns.add("法人单位");
+			matchColumns.add("单位名称");
 			matchColumns.add("法人");
 			
-			String year = "2000";
+			String year = "2003";
 			String seqFlag = "_续集";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
 							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果" + seqFlag + ".xlsx",
