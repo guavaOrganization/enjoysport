@@ -1,11 +1,11 @@
-package com.example.javanet.netty;
+package com.example.javanet.netty.protobuf;
 
-
-import java.util.ArrayList;
-import java.util.List;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SubReqClientHandle_Protobuf extends ChannelHandlerAdapter {
 	public SubReqClientHandle_Protobuf() {

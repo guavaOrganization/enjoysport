@@ -1,4 +1,4 @@
-package com.example.javanet.netty;
+package com.example.javanet.netty.protobuf;
 
 import java.util.ArrayList;
 import java.util.List;

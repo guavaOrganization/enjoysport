@@ -1,4 +1,4 @@
-package com.example.javanet.netty;
+package com.example.javanet.netty.protobuf;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,4 +1,4 @@
-package com.example.javanet.netty;
+package com.example.javanet.netty.protobuf;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
