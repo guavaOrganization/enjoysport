@@ -82,7 +82,7 @@ public class EnterpriseDataTesting {
 			matchColumns.add("法人单位");
 			matchColumns.add("法人代表");
 			
-			String year = "2006";
+			String year = "2007";
 			String seqFlag = "_续集";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
 							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果" + seqFlag + ".xlsx",

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project name="stack_overflow">
+	<path id="classpath">
+		<pathelement location="lib/jibx-tools.jar" />
+		<pathelement location="lib/jibx-tools.jar" />
+	</path>
+	<target name="bindgen">
+		<echo message="Running BinGen tool">
+		</echo>
+		<java classpathref="classpath" fork="true" failonerror="true" classname="org.jibx.binding.generator.BindGen">
+			<arg value="-s" />
+			<arg value="${basedir}/src/com/example/javanet/netty/http_xml" />
+			<arg value="com.example.javanet.netty.http_xml.Order" />
+		</java>
+	</target>
+</project>

@@ -15,7 +15,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -43,11 +42,11 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 
 	@Override
 	protected void messageReceived(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-		if (!request.decoderResult().isSuccess()) {
+		if (!request.decoderResult().isSuccess()) {// 判断解码结果
 			sendError(ctx, HttpResponseStatus.BAD_REQUEST); // 400
 			return;
 		}
-		if (request.method() != HttpMethod.GET) {
+		if (request.method() != HttpMethod.GET) {// 只允许GET方法
 			sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED);
 			return;
 		}
@@ -90,6 +89,8 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 			response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 		}
 		ctx.write(response);
+		
+		// 通过ChunkedFile对象直接将文件写入到发送缓冲区中。最后为sendFileFuture增加GenericFutureListener，如果发送完成，打印“Transfer complete.”
 		ChannelFuture sendFileFuture;
 		sendFileFuture = ctx.write(new ChunkedFile(randomAccessFile, 0, fileLength, 8192), ctx.newProgressivePromise());
 		sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
@@ -108,6 +109,8 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 			}
 		});
 		
+		// 如果使用chunked编码，最后需要发送一个编码结束的空消息体，将LastHttpContent的EMPTY_LAST_CONTENT发送到缓冲区中，标识所有的消息体已经发送完成。
+		// 同时调用fulsh方法将之前在发送缓冲区的消息刷新到SocketChannel中发送给对方。
 		ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
 		if (!HttpHeaderUtil.isKeepAlive(request)) {
 			lastContentFuture.addListener(ChannelFutureListener.CLOSE);
@@ -172,7 +175,7 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 	
 	private String sanitizeUri(String uri) {
 		try {
-			uri = URLDecoder.decode(uri, "UTF-8");
+			uri = URLDecoder.decode(uri, "UTF-8"); // 使用UTF-8字符集对uri进行解码
 		} catch (UnsupportedEncodingException e) {
 			try {
 				uri = URLDecoder.decode(uri, "ISO-8859-1");
