@@ -7,6 +7,7 @@ public class Order {
 	private Shipping shipping;
 	private Address shipTo;
 	private Float total;
+	private String remark;
 
 	public long getOrderNumber() {
 		return orderNumber;
@@ -54,5 +55,20 @@ public class Order {
 
 	public void setTotal(Float total) {
 		this.total = total;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	@Override
+	public String toString() {
+		return "Order [orderNumber=" + orderNumber + ", customer=" + customer
+				+ ", billTo=" + billTo + ", shipping=" + shipping + ", shipTo="
+				+ shipTo + ", total=" + total + ", remark=" + remark + "]";
 	}
 }

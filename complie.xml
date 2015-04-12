@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<project name="stack_overflow">
+<?xml version="1.0" ?>
+<project name="complie" default="bind">
 	<property name="prjBase" value="." />
 	<property name="src" value="${prjBase}/src" />
 	<property name="lib" value="${prjBase}/html/WEB-INF/lib" />
@@ -12,12 +12,14 @@
 		<pathelement location="${lib}/log4j-1.2.11.jar" />
 		<pathelement location="${classes}" />
 	</path>
-	<target name="bindgen">
-		<echo message="Running BinGen tool" />
-		<java classpathref="classpath" fork="true" failonerror="true" classname="org.jibx.binding.generator.BindGen">
-			<arg value="-s" />
-			<arg value="${basedir}/src/com/example/javanet/netty/http_xml" />
-			<arg value="com.example.javanet.netty.http_xml.Order" />
-		</java>
+	<target name="bind">
+		<taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
+			<classpath>
+				<fileset dir="${lib}" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<bind binding="${prjBase}/binding.xml">
+			<classpath refid="classpath"/>
+		</bind>
 	</target>
 </project>
