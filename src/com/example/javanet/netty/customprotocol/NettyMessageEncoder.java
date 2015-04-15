@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage>{
-	private MarshallingEncoder marshallingEncoder;
+	private NettyMarshallingEncoder marshallingEncoder;
 	
 	public NettyMessageEncoder() throws IOException {
-		marshallingEncoder = new MarshallingEncoder();
+		marshallingEncoder = MarshallingCodeCFactory.buildMarshallingEncoder();
 	}
 
 	@Override
@@ -31,22 +31,22 @@ public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage>{
 		String key = null;
 		byte[] keyArray = null;
 		Object value = null;
+		
 		for (Map.Entry<String, Object> param : msg.getHeader().getAttachment().entrySet()) {
 			key = param.getKey();
 			keyArray = key.getBytes("UTF-8");
 			sendBuf.writeInt(keyArray.length);
 			sendBuf.writeBytes(keyArray);
-			marshallingEncoder.encode(value, sendBuf);
+			value = param.getValue();
+			marshallingEncoder.encode(ctx, value, sendBuf);
 		}
 		key = null;
 		keyArray = null;
 		value = null;
 		if (msg.getBody() != null) {
-			marshallingEncoder.encode(msg.getBody(), sendBuf);
-		} else {
-			// 写入Buffer的长度
-			sendBuf.writeInt(0);
-			sendBuf.setInt(4, sendBuf.readableBytes()); // 在下标4写入Buffer的长度
+			marshallingEncoder.encode(ctx, msg.getBody(), sendBuf);
 		}
+		sendBuf.setInt(4, sendBuf.readableBytes()); // 在下标4写入Buffer的长度
+		out.add(sendBuf);
 	}
 }

@@ -18,6 +18,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class LoginAuthReqHandler extends ChannelHandlerAdapter{
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		// 当客户端跟服务端TCP三次握手成功之后，由客户端构造握手请求消息发送给服务端
 		ctx.writeAndFlush(buildLoginReq());
 	}
 	

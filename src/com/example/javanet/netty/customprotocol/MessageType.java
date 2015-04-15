@@ -10,7 +10,7 @@ public enum MessageType {
 	 * 5 : 心跳请求消息
 	 * 6 : 心跳应答消息
 	 */
-	LOGIN_REQ((byte) 3), LOGIN_RESP((byte) 4);
+	LOGIN_REQ((byte) 3), LOGIN_RESP((byte) 4), HEARTBEAT_REQ((byte) 5), HEARTBEAT_RESP((byte) 6);
 	
 	private byte type;
 

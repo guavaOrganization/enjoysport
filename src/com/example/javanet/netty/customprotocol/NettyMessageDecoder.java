@@ -19,11 +19,11 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
  * @since
  */
 public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
-	private MarshallingDecoder marshallingDecoder;
+	private NettyMarshallingDecoder marshallingDecoder;
 
-	public NettyMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
-		super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
-		marshallingDecoder = new MarshallingDecoder();
+	public NettyMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength,int lengthAdjustment, int initialBytesToStrip) { 
+		super(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+		marshallingDecoder = MarshallingCodeCFactory.buildMarshallingDecoder();  
 	}
 	
 	@Override
@@ -34,30 +34,30 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 		}
 		NettyMessage message = new NettyMessage();
 		Header header = new Header();
-		header.setCrcCode(in.readInt());
-		header.setLength(in.readInt());
-		header.setSessionID(in.readLong());
-		header.setType(in.readByte());
-		header.setPriority(in.readByte());
-		int size = in.readInt();// 消息长度
+		header.setCrcCode(frame.readInt());
+		header.setLength(frame.readInt());
+		header.setSessionID(frame.readLong());
+		header.setType(frame.readByte());
+		header.setPriority(frame.readByte());
+		int size = frame.readInt();// 消息长度
 		if (size > 0) {
 			Map<String, Object> attch = new HashMap<String, Object>();
 			int keySize = 0;
 			byte[] keyArray = null;
 			String key = null;
 			for (int i = 0; i < size; i++) {
-				keySize = in.readInt();
+				keySize = frame.readInt();
 				keyArray = new byte[keySize];
-				in.readBytes(keyArray);
+				frame.readBytes(keyArray);
 				key = new String(keyArray, "UTF-8");
-				attch.put(key, marshallingDecoder.decode(in));
+				attch.put(key, marshallingDecoder.decode(ctx, frame));
 			}
 			keyArray = null;
 			key = null;
 			header.setAttachment(attch);
 		}
-		if (in.readableBytes() > 4) {
-			message.setBody(marshallingDecoder.decode(in));
+		if (frame.readableBytes() > 0) {
+			message.setBody(marshallingDecoder.decode(ctx, frame));
 		}
 		message.setHeader(header);
 		return message;
