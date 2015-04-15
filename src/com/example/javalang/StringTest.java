@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 
 public class StringTest {
 	public static void main(String[] args) throws UnsupportedEncodingException {
+		String tempStr = "abc";
+		String str = tempStr + "b";
+		str = s(tempStr, str);
 		System.out.println(System.getProperty("file.encoding"));
 		byte[] bytes = "陈俊".getBytes(); // -->字符根据相关编码转换为二进制流
 		for (byte b : bytes)
@@ -27,5 +30,11 @@ public class StringTest {
 		String str1 = "\u7528\u6237\u767B\u5F55";//unicode编码
 		System.out.println(str1); 
 		System.out.println("\u6C49");
+	}
+	
+	public static String s(String s, String k) {
+		String temp = s + k; // 可以通过javap -c StringTest，看到此段逻辑，Java在实现的时候使用StringBuilder进行了字符串联
+		temp += s + temp;
+		return temp;
 	}
 }
