@@ -20,7 +20,7 @@ public class InetAddressTest {
 	
 	// @Test
 	public void testMethod_getName() throws UnknownHostException {
-		// 此方法会建立与本地DBS服务器的一个连接，来查找名字和数字地址
+		// 此方法会建立与本地DNS服务器的一个连接，来查找名字和数字地址
 		// 如果DNS服务器找不到这个地址，这个方法会抛出UnknownHostException异常，这是IOException的一个子类
 		InetAddress address1 = InetAddress.getByName(TEST_HOST);
 		System.out.println(address1);

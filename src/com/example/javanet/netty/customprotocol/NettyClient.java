@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -40,7 +41,7 @@ public class NettyClient {
 							sc.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4, -8, 0));
 							sc.pipeline().addLast("MessageEncoder", new NettyMessageEncoder());
 							
-							// sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+							sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
 							
 							sc.pipeline().addLast("LoginAuthHandler", new LoginAuthReqHandler());
 							sc.pipeline().addLast("HeartBeatHandler", new HeartBeatReqHandler());

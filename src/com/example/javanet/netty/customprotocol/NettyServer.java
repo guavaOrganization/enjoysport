@@ -10,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 
 public class NettyServer {
 	public void bind() throws Exception {
@@ -25,7 +26,7 @@ public class NettyServer {
 						sc.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4, -8, 0));
 						sc.pipeline().addLast(new NettyMessageEncoder());
 						
-						// sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+						sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
 						
 						sc.pipeline().addLast(new LoginAuthRespHandler());
 						sc.pipeline().addLast(new HeartBeatRespHandler());

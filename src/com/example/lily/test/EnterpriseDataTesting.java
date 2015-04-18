@@ -73,16 +73,16 @@ public class EnterpriseDataTesting {
 		try {
 			long now = System.currentTimeMillis();
 			List<Integer> matchIndexs = new ArrayList<Integer>();
-//			matchIndexs.add(4);
+			matchIndexs.add(4);
 			matchIndexs.add(5);
 //			matchIndexs.add(6);
 			
 			List<String> matchColumns = new ArrayList<String>();
-//			matchColumns.add("法人代码");
+			matchColumns.add("法人代码");
 			matchColumns.add("法人单位");
 //			matchColumns.add("法人代表");
 			
-			String year = "2008";
+			String year = "2009";
 			String seqFlag = "_续集";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
 							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果" + seqFlag + ".xlsx",
