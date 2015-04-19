@@ -115,9 +115,14 @@ public class MultiplexerTimeServer implements Runnable {
 		if (key.isValid()) {
 			if (key.isAcceptable()) {
 				ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
+				// 如果此通道处于非阻塞模式，那么在不存在挂起的连接时，此方法将直接返回 null。否则，在新的连接可用或者发生I/O错误之前会无限期地阻塞它。
+				// 不管此通道的阻塞模式如何，此方法返回的套接字通道（如果有）将处于阻塞模式。
+				// 此方法执行的安全检查与 ServerSocket类的accept方法执行的安全检查完全相同。也就是说，如果已安装了安全管理器，则对于每个新的连接，此方法都会验证安全管理器的 checkAccept 方法是否允许使用该连接的远程端点的地址和端口号。
 				SocketChannel sc = ssc.accept();
-				sc.configureBlocking(false);
-				sc.register(selector, SelectionKey.OP_READ);
+				if (null != sc) {
+					sc.configureBlocking(false);
+					sc.register(selector, SelectionKey.OP_READ);
+				}
 			}
 			
 			if (key.isReadable()) {
