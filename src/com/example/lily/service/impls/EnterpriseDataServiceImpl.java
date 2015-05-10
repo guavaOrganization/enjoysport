@@ -32,9 +32,9 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 	private final static String UNMATCH_TIP = "未匹配到结果数据的原因";// 未匹配到数据的原因
 	// 土耳其和哈萨克斯坦是横跨亚欧两洲的国家
 	// 乌兹别克斯坦、叙利亚、也门、吉尔吉斯斯坦 是亚洲国家
-	private final static String ASIA_COUNTRY = "乌兹别克斯坦,中华人民共和国,中国,中国香港,台湾省,中国台湾,中国澳门,阿富汗,约旦,科威特,伊朗,阿拉伯联合酋长国,伊拉克,柬埔寨,缅甸,巴基斯坦,孟加拉,日本,韩国,泰国,马来西亚,印度尼西亚,越南,老挝,印度,斯里兰卡,沙特阿拉伯,尼泊尔,锡金,阿曼,黎巴嫩,以色列,巴林,东帝汶,朝鲜,蒙古,新加坡,菲律宾,文莱";
-	private final static String DEVELOPED_COUNTRY = "澳大利亚,比利时,保加利亚,塞浦路斯,捷克共和国,丹麦,爱沙尼亚,芬兰,法国,德国,希腊,匈牙利,爱尔兰,意大利,拉脱维亚,立陶宛,卢森堡,马耳他,荷兰,波兰,葡萄牙,罗马尼亚,斯洛伐克,斯洛文尼亚,西班牙,瑞典,英国,直布罗陀,冰岛,挪威,瑞士,加拿大,美国,澳大利亚,百慕大,以色列,日本,新西兰";
-	private final static String EAST_AREA = "北京市,天津市,上海市,山东省,江苏省,浙江省,福建省,广东省,海南省,辽宁省";
+	public final static String ASIA_COUNTRY = "乌兹别克斯坦,中华人民共和国,中国,中国香港,台湾省,中国台湾,中国澳门,阿富汗,约旦,科威特,伊朗,阿拉伯联合酋长国,伊拉克,柬埔寨,缅甸,巴基斯坦,孟加拉,日本,韩国,泰国,马来西亚,印度尼西亚,越南,老挝,印度,斯里兰卡,沙特阿拉伯,尼泊尔,锡金,阿曼,黎巴嫩,以色列,巴林,东帝汶,朝鲜,蒙古,新加坡,菲律宾,文莱";
+	public final static String DEVELOPED_COUNTRY = "澳大利亚,比利时,保加利亚,塞浦路斯,捷克共和国,丹麦,爱沙尼亚,芬兰,法国,德国,希腊,匈牙利,爱尔兰,意大利,拉脱维亚,立陶宛,卢森堡,马耳他,荷兰,波兰,葡萄牙,罗马尼亚,斯洛伐克,斯洛文尼亚,西班牙,瑞典,英国,直布罗陀,冰岛,挪威,瑞士,加拿大,美国,澳大利亚,百慕大,以色列,日本,新西兰";
+	public final static String EAST_AREA = "北京市,天津市,上海市,山东省,江苏省,浙江省,福建省,广东省,海南省,辽宁省";
 	
 	@Autowired
 	@Qualifier("com.example.lily.dao.impls.EnterpriseDataDAOImpl")
@@ -154,7 +154,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				tempList.add("尝试匹配MDB文件中的[" + matchedColumnNameStr + "]，都未能匹配到数据");
 				unmatchResultList.add(tempList);// 记录未匹配的行
 				continue;
-			}
+			} 
 			
 			// 匹配到了数据
 			List<List<String>> resultDatas = queryDBResultHolder.getResultDatas();// 查询结果数据
@@ -184,12 +184,12 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			return null;
 		}
 		boolean need = true;
-		if(need){
+		if (need) {
 			// 需要翻译的列
 			List<Integer> needToBeTranslatedIndexs = new ArrayList<Integer>();
-			needToBeTranslatedIndexs.add(8);
-//			needToBeTranslatedIndexs.add(3);
-//			needToBeTranslatedIndexs.add(14);
+			needToBeTranslatedIndexs.add(3);
+			needToBeTranslatedIndexs.add(3);
+			needToBeTranslatedIndexs.add(14);
 			
 			for (int i = 0; i < matchIndexs.size(); i++) {
 				int matchIndex = matchIndexs.get(i);
@@ -211,7 +211,6 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				for (int j = 0; j < needToBeTranslatedIndexs.size(); j++) {
 					// 翻译字段 Start
 					int needToBeTranslatedIndex = needToBeTranslatedIndexs.get(j) - 1;
-					/**
 					if (i == 0 && j == 0) {
 						translateResults.add("是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
 						continue;
@@ -220,15 +219,12 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 						translateResults.add("是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
 						continue;
 					}
-					// if (i == 0 && j == 2) {
-					*/
-					if (i == 0 && j == 0) {
+					if (i == 0 && j == 2) {
 						translateResults.add("是否为我国东部地区(1:东部地区;0:非东部地区)");
 						continue;
 					}
 					
 					String tempData = data.get(needToBeTranslatedIndex) == null ? "" : data.get(needToBeTranslatedIndex).trim();
-					/**
 					if (j == 0) {
 						if (ASIA_COUNTRY.indexOf(tempData) >= 0) { // 是否为亚洲国家
 							translateResults.add("1");
@@ -246,16 +242,14 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 						continue;
 					} 
 					if (j == 2) {
-					*/
-					if (j == 0) {
 						if (EAST_AREA.indexOf(tempData) >= 0) { // 是否为我国东部地区
 							translateResults.add("1");
 						} else {
 							translateResults.add("0");
 						}
 						continue;
-					} 
-					// 翻译字段 End
+						// 翻译字段 End
+					}
 				}
 				
 				// 添加加到data行中

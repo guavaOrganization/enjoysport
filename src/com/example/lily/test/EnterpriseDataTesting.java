@@ -28,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.example.lily.javabeans.QueryDBResultHolder;
+import com.example.lily.service.impls.EnterpriseDataServiceImpl;
 import com.example.lily.service.interfaces.IEnterpriseDataService;
 import com.guava.util.GuavaExcelUtil;
 
@@ -53,11 +54,10 @@ public class EnterpriseDataTesting {
 			matchColumns.add("法人单位");
 			matchColumns.add("法人代表");
 	
-//			List<List<String>> excelDatas = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊续集.xlsx");
-			List<List<String>> excelDatas = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊啊啊.xlsx");
+			List<List<String>> excelDatas = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充.xlsx");
 			List<List<String>> repairedList = enterpriseDataService.repairListData(excelDatas, 4993, 10000, 10, 1, matchIndexs, "t_enterprise_data_2007", matchColumns);
 		
-			OutputStream os = new FileOutputStream("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊啊修复后的数据.xlsx");
+			OutputStream os = new FileOutputStream("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充_企业数据修复.xlsx");
 			XSSFWorkbook wb = new XSSFWorkbook();
 			GuavaExcelUtil.writeDataToExcel(repairedList, "修补结果数据", wb, os);
 			
@@ -69,24 +69,23 @@ public class EnterpriseDataTesting {
 	}
 	
 	@Test
-	public void testQueryByLegalPersonCode() {
+	public void testQueryByLegalPersonCode() {// 根据
 		try {
 			long now = System.currentTimeMillis();
 			List<Integer> matchIndexs = new ArrayList<Integer>();
-			matchIndexs.add(4);
-			matchIndexs.add(5);
-//			matchIndexs.add(6);
+			matchIndexs.add(10);
+			matchIndexs.add(11);
+			matchIndexs.add(12);
 			
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
-			matchColumns.add("法人单位");
-//			matchColumns.add("法人代表");
+			matchColumns.add("企业名称");
+			matchColumns.add("法人代表姓名");
 			
-			String year = "2009";
-			String seqFlag = "_续集";
+			String year = "1999";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
-							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "年企业财务数据整理结果" + seqFlag + ".xlsx",
-							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊续集_修复后的数据.xlsx",
+							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "_境外直接投资企业_补充_年企业财务数据整理结果" + ".xlsx",
+							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充.xlsx",
 							matchIndexs, "t_enterprise_data_" + year, matchColumns, true, 10);
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));
@@ -254,10 +253,10 @@ public class EnterpriseDataTesting {
 	}
 	
 	// @Test
-	public void lookRepetitiveData() {
+	public void lily20150422_2() { // 根据《境外直接投资企业》或《境外直接投资企业_补充》得出《****多国投资数据比对》数据,后置方法是lily20150422_3
 		try {
 			Set<String> set = new HashSet<String>();
-			List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊啊啊.xlsx");
+			List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充.xlsx");
 			List<List<String>> no = new ArrayList<List<String>>();
 			no.add(list.get(0));
 			List<List<String>> yes = new ArrayList<List<String>>();
@@ -330,7 +329,7 @@ public class EnterpriseDataTesting {
 				}
 			});
 			yes.add(0, list.get(0));
-			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\非对外投资企业数据匹配\\多国投资数据比对.xlsx";
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充_多国投资数据比对.xlsx";
 			OutputStream os = new FileOutputStream(targetAbsoluteFilePath);
 			XSSFWorkbook wb = new XSSFWorkbook();
 			GuavaExcelUtil.writeDataToExcel(yes, "多国投资", wb, os);
@@ -348,10 +347,10 @@ public class EnterpriseDataTesting {
 	
 	
 //	@Test
-	public void comp() {
+	public void lily20150422_3() {// 根据《****多国投资数据比对》文件获取 "多国投资"和"单国N连投资",前置方法是${@link lily20150422_2())
 		// 根据excel表格中的"Country"和"Acquiror name"去重。
 		// 统计去重后的列表数据中"Acquiror name"的个数
-		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\非对外投资企业数据匹配\\多国投资数据比对.xlsx");
+		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充_多国投资数据比对.xlsx");
 		Set<String> set = new HashSet<String>();
 		Set<String> reSet = new HashSet<String>();
 
@@ -393,7 +392,7 @@ public class EnterpriseDataTesting {
 		
 		try {
 			OutputStream os;
-			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\非对外投资企业数据匹配\\多国投资数据比对最终结果final.xlsx";
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充_多国投资数据比对_最终结果final.xlsx";
 			os = new FileOutputStream(targetAbsoluteFilePath);
 			XSSFWorkbook wb = new XSSFWorkbook();
 			GuavaExcelUtil.writeDataToExcel(reslut, "多国投资", wb, os);
@@ -403,6 +402,184 @@ public class EnterpriseDataTesting {
 			GuavaExcelUtil.writeDataToExcel(sigleReslut, "单国N连投资", wb, os);
 			if(sigleReslut != null)
 				sigleReslut = null;// Help GC
+			wb.write(os);
+			os.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+//	@Test
+	public void lily20150422() { // 根据"境外投资企业不匹配" 修复  "啊啊啊啊数据遗漏部分终极版"的数据
+		List<List<String>> listA = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊啊数据遗漏部分终极版.xlsx");
+		List<List<String>> listB = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外投资企业不匹配.xlsx");
+
+		List<List<String>> result = new ArrayList<List<String>>();
+		List<List<String>> noResult = new ArrayList<List<String>>();
+		result.add(listA.get(0));
+		result.get(0).addAll(1, listB.get(0));
+		noResult.add(listA.get(0));
+		
+		for (int i = 0; i < listA.size(); i++) {
+			List<String> rowA = listA.get(i);
+			if (i == 0)
+				continue;
+			List<List<String>> matched = new ArrayList<List<String>>();
+			for (int j = 0; j < listB.size(); j++) {
+				if (j == 0)
+					continue;
+				List<String> rowB = listB.get(j);
+				if (rowA.get(1).trim().equals(rowB.get(2).trim())) {
+					matched.add(rowB);
+				}
+			}
+			
+			if (matched.size() == 0) {
+				noResult.add(rowA);
+			} else {
+				for (int k = 0; k < matched.size(); k++) {
+					List<String> newRow = new ArrayList<String>();
+					newRow.addAll(rowA);
+					newRow.addAll(1, matched.get(k));
+					result.add(newRow);
+				}
+			}
+			matched = null; //help GC
+		}
+		listA = null;
+		listB = null;
+		
+		
+		try {
+			OutputStream os;
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\啊啊啊啊数据遗漏部分终极版final.xlsx";
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			GuavaExcelUtil.writeDataToExcel(result, "匹配到结果数据", wb, os);
+			if(result != null)
+				result = null;// Help GC
+			
+			GuavaExcelUtil.writeDataToExcel(noResult, "未匹配到结果数据", wb, os);
+			if(noResult != null)
+				noResult = null;// Help GC
+			wb.write(os);
+			os.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//	@Test
+	// 《境外直接投资企业》和《境外直接投资企业-补充》里分下将数据中的国家列按照《UNCATED发达国家》中的国家分类，将国家（第C列）分为发达国家（1）非发达国家（0）、亚洲国家（1）非亚洲国家（0）、将省（第P列）分为东部地区（1）
+	public void lily20150422_1() {
+		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充.xlsx");
+		for (int i = 0; i < list.size(); i++) {
+			List<String> row = list.get(i);
+			if (i == 0) {
+				row.add(3, "是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
+				row.add(4, "是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
+				row.add(16, "是否为我国东部地区(1:东部地区;0:非东部地区)");
+				continue;
+			}
+			
+			String isAsiaCountry = "0";
+			if (EnterpriseDataServiceImpl.ASIA_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为亚洲国家
+				isAsiaCountry = "1";
+			} else {
+				isAsiaCountry = "0";
+			}
+			String isDeveloped = "0";
+			if (EnterpriseDataServiceImpl.DEVELOPED_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为高收入国家
+				isDeveloped = "1";
+			} else {
+				isDeveloped = "0";
+			}
+			String isEastArea = "0";
+			if (EnterpriseDataServiceImpl.EAST_AREA.indexOf(row.get(13)) >= 0) { // 是否为我国东部地区
+				isEastArea = "1";
+			} else {
+				isEastArea = "0";
+			}
+			row.add(3, isAsiaCountry);
+			row.add(4, isDeveloped);
+			row.add(16, isEastArea);
+		}
+		
+		try {
+			OutputStream os;
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充_国家分类.xlsx";
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			GuavaExcelUtil.writeDataToExcel(list, "国家分类", wb, os);
+			if(list != null)
+				list = null;// Help GC
+			wb.write(os);
+			os.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+//	@Test
+	// 根据lily20150422_3()方法得出的结果文件"境外直接投资企业_补充_多国投资数据比对_最终结果final"或"境外直接投资企业_多国投资数据比对_最终结果final"进行国家分类
+	public void lily20150422_4() {
+		String excelFileName = "境外直接投资企业_多国投资数据比对_最终结果final";
+		
+		List<List<List<String>>> allList = GuavaExcelUtil.loadExcelDataToList( "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + excelFileName + ".xlsx", 3);
+
+		for(int index = 0 ; index < allList.size();index ++ ){
+			List<List<String>> list = allList.get(index);
+			for (int i = 0; i < list.size(); i++) {
+				List<String> row = list.get(i);
+				if (i == 0) {
+					row.add(3, "是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
+					row.add(4, "是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
+					row.add(16, "是否为我国东部地区(1:东部地区;0:非东部地区)");
+					continue;
+				}
+				
+				String isAsiaCountry = "0";
+				if (EnterpriseDataServiceImpl.ASIA_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为亚洲国家
+					isAsiaCountry = "1";
+				} else {
+					isAsiaCountry = "0";
+				}
+				String isDeveloped = "0";
+				if (EnterpriseDataServiceImpl.DEVELOPED_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为高收入国家
+					isDeveloped = "1";
+				} else {
+					isDeveloped = "0";
+				}
+				String isEastArea = "0";
+				if (EnterpriseDataServiceImpl.EAST_AREA.indexOf(row.get(13)) >= 0) { // 是否为我国东部地区
+					isEastArea = "1";
+				} else {
+					isEastArea = "0";
+				}
+				row.add(3, isAsiaCountry);
+				row.add(4, isDeveloped);
+				row.add(16, isEastArea);
+			}
+		}
+		
+		try {
+			OutputStream os;
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + excelFileName + "_国家分类.xlsx";
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			for (int index = 0; index < allList.size(); index++) {
+				List<List<String>> list = allList.get(index);
+				GuavaExcelUtil.writeDataToExcel(list, index + "", wb, os);
+				if (list != null)
+					list = null;// Help GC
+			}
 			wb.write(os);
 			os.close();
 		} catch (FileNotFoundException e) {

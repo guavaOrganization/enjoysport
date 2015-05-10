@@ -17,7 +17,7 @@ import org.junit.Test;
  *  </span>
  *  <span>
  *  （2）字段的描述类型（修饰符public/protected/default/private）是与调用者与操作对象字段的关系一致。也就是说调用者能够直接操作对象字段，那么就可以反射进行原子操作。
- *   但是对于父类的字段，子类是不能直接操作的，尽管子类可以访问父类的字段。
+ *   【但是对于父类的字段，子类是不能直接操作的，尽管子类可以访问父类的字段。】
  *  </span>
  *  <span>
  *  只能是实例变量，不能是类变量，也就是说不能加static关键字。
@@ -61,6 +61,7 @@ public class TestFieldUpdater {
         DemoData data = new DemoData();
 		System.out.println(getIntegerUpdater("value1").get(data));
 		System.out.println(getIntegerUpdater("value2").decrementAndGet(data));
+		// value3字段对于TestFieldUpdater不可见，故不能修改
 		// System.out.println(getIntegerUpdater("value3").decrementAndGet(data));
 		System.out.println(getAtomicReferenceFieldUpdater("value5").get(data));
 	}

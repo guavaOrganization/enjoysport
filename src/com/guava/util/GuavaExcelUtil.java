@@ -69,46 +69,56 @@ public class GuavaExcelUtil {
 		}
 	}
 	
-	
+	public static List<List<String>> loadExcelDataToList(String absolutePath) {
+		return loadExcelDataToList(absolutePath, 1).get(0);
+	}
 	
 	/**
 	 * 从excel中加载所有的列，然后存放到List<List<String>>中
 	 * @since
 	 * @throws
 	 */
-	public static List<List<String>> loadExcelDataToList(String absolutePath) {
+	public static List<List<List<String>>> loadExcelDataToList(String absolutePath, int sheetNum) {
 		InputStream is = null;
 		XSSFWorkbook workbook = null;
-		List<List<String>> allDatas = new ArrayList<List<String>>();
 		DecimalFormat df = new DecimalFormat("0"); 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		List<List<List<String>>> excelAllDatas = new ArrayList<List<List<String>>>();
 		try {
 			long now = System.currentTimeMillis();
 			is = new FileInputStream(new File(absolutePath));
 			workbook = new XSSFWorkbook(is);
-			XSSFSheet sheet = workbook.getSheetAt(0);// 读取第一个sheet页数据
-			for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) { // 迭代行
-				XSSFRow xssfRow = sheet.getRow(i);
-				List<String> rows = new ArrayList<String>();
-				for (int j = xssfRow.getFirstCellNum(); j < xssfRow.getLastCellNum(); j++) {// 迭代列
-					XSSFCell xssfCell = xssfRow.getCell(j);
-					if (null == xssfCell) {
-						rows.add(StringUtils.EMPTY);
-						continue;
+			for (int index = 0; index < sheetNum; index++) {
+				List<List<String>> sheetAllDatas = new ArrayList<List<String>>();
+				XSSFSheet sheet = workbook.getSheetAt(index);// 读取第一个sheet页数据
+				for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) { // 迭代行
+					XSSFRow xssfRow = sheet.getRow(i);
+					if(null == xssfRow){
+						System.out.println("第[" + (i + 1) + "]行为空");
+						break;
 					}
-					if (Cell.CELL_TYPE_NUMERIC == xssfCell.getCellType()) {// 数字 和 时间
-						if(HSSFDateUtil.isCellDateFormatted(xssfCell)) {// 时间
-							rows.add(sdf.format(xssfCell.getDateCellValue()));
-						}else{
-							rows.add(df.format(xssfCell.getNumericCellValue()));
+					List<String> rows = new ArrayList<String>();
+					for (int j = xssfRow.getFirstCellNum(); j < xssfRow.getLastCellNum(); j++) {// 迭代列
+						XSSFCell xssfCell = xssfRow.getCell(j);
+						if (null == xssfCell) {
+							rows.add(StringUtils.EMPTY);
+							continue;
 						}
-					} else if (Cell.CELL_TYPE_BOOLEAN == xssfCell.getCellType()) {// Blooean类型
-						rows.add(xssfCell.getBooleanCellValue() + "");
-					} else {
-						rows.add(xssfCell.toString());
+						if (Cell.CELL_TYPE_NUMERIC == xssfCell.getCellType()) {// 数字 和 时间
+							if(HSSFDateUtil.isCellDateFormatted(xssfCell)) {// 时间
+								rows.add(sdf.format(xssfCell.getDateCellValue()));
+							}else{
+								rows.add(df.format(xssfCell.getNumericCellValue()));
+							}
+						} else if (Cell.CELL_TYPE_BOOLEAN == xssfCell.getCellType()) {// Blooean类型
+							rows.add(xssfCell.getBooleanCellValue() + "");
+						} else {
+							rows.add(xssfCell.toString());
+						}
 					}
+					sheetAllDatas.add(rows);
 				}
-				allDatas.add(rows);
+				excelAllDatas.add(sheetAllDatas);
 			}
 			if(log.isInfoEnabled())
 				log.info("耗时：" + (System.currentTimeMillis() - now));
@@ -132,6 +142,6 @@ public class GuavaExcelUtil {
 				}
 			}
 		}
-		return allDatas;
+		return excelAllDatas;
 	}
 }
