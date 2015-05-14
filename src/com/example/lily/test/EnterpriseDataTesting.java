@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.example.lily.javabeans.QueryDBResultHolder;
 import com.example.lily.service.impls.EnterpriseDataServiceImpl;
 import com.example.lily.service.interfaces.IEnterpriseDataService;
+import com.guava.codeautogenerator.core.support.StringUtils;
 import com.guava.util.GuavaExcelUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -68,7 +69,7 @@ public class EnterpriseDataTesting {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testQueryByLegalPersonCode() {// 根据
 		try {
 			long now = System.currentTimeMillis();
@@ -585,6 +586,185 @@ public class EnterpriseDataTesting {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 根据Acquiror name到2007年的工业企业数据库中匹配，如果工业企业数据库的企业名字和Acquiror
+	 * name相同，则为同一家企业，则匹配成功
+	 * ，然后把法人代码及其之后的列补充好如果2007年中找不到那个企业，则去2002年工业企业数据中进行匹配，规则相同。
+	 * @since
+	 * @throws
+	 */
+//	@Test
+	public void lily20150510_1() {
+		try {
+			enterpriseDataService.lily20150510_1();
+//			enterpriseDataService.lily20150510_2();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void odan_20150510() {
+		for (int index = 1; index <= 12; index++) {
+			String yearMonth = "2001" + (index < 10 ? "0" + index : index);
+			String tableName = "odan_customs_" + yearMonth;
+			try {
+				for (int i = 33; i <= 40; i++) {
+					for (int j = 84; j <= 92; j++) {
+						enterpriseDataService.odan_20150510(true, tableName, yearMonth, false, i, j, 85);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	// @Test
+	public void test_odan_20150511(){
+		for (int i = 1; i <= 12; i++) {
+			String month = i >= 10 ? "" + i : "0" + i;
+			odan_20150511("odan_customs_2001" + month, "2001" + month);
+		}
+	}
+	
+	public void odan_20150511(String tableName,String yearMonth) {
+		for (int index = 1; index <= 5; index++) {
+			List<List<String>> allList = new ArrayList<List<String>>(); 
+			try {
+				boolean addHead = false;
+				for (int i = 33; i <= 40; i++) {
+					if (!((index == 1 && (33 <= i && i <= 34))
+					   || (index == 2 && (35 <= i && i <= 36)) 
+					   || (index == 3 && (37 <= i && i <= 38))
+					   || (index == 4 && (i == 39))
+					   || (index == 5 && (i == 40))
+						 ))
+						continue;
+					System.out.println("zzzzzzzzzzzzzzzzz");
+					for (int j = 84; j <= 92; j++) {
+						try {
+							List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\odan\\" + yearMonth + "\\" + tableName + "_" + i + "_" + j + ".xlsx");
+							if(null == list || list.size() ==0 || list.size() == 1)
+								continue;
+							if (addHead) {
+								list.remove(0);
+							}
+							allList.addAll(list);
+							addHead = true;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				OutputStream os;
+				String targetAbsoluteFilePath = "E:\\lily_mcfly\\odan\\" + yearMonth + "\\" + tableName + "_" + index + ".xlsx";
+				os = new FileOutputStream(targetAbsoluteFilePath);
+				XSSFWorkbook wb = new XSSFWorkbook();
+				GuavaExcelUtil.writeDataToExcel(allList, "匹配到结果的数据", wb, os);
+				if(allList != null)
+					allList = null;// Help GC
+				wb.write(os);
+				os.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * 现有A和B(见附录一)两个Excel原始文件。需要对A文件中的"多国投资(多国投资公司总共108个)"Sheet页(以下简称ASheet)的数据进行去重，去重的条件如下：
+		根据ASheet的单行数据的Country、Acquiror name、approvalDate三列的值与B文件中的"投资多个国家的"Sheet页(以下简称BSheet)
+		的Country、Acquiror name、approvalDate逐行对比，如果存在一致数据，则将ASheet也对应的数据删除；否则保留。
+		
+		附录一：
+		A : 境外直接投资企业_补充_多国投资数据比对_最终结果final_国家分类.xlsx
+		B : 对外直接投资2007年.xlsx
+	 * @since
+	 * @throws
+	 */
+//	@Test
+	public void lily_20150513() {
+		try {
+			List<List<List<String>>> aLists = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\原始数据\\境外直接投资企业_补充_多国投资数据比对_最终结果final_国家分类.xlsx",3);
+			List<List<List<String>>> bLists = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\原始数据\\对外直接投资2007年.xlsx",3);
+			
+			for (int index = 0; index < 3; index++) {
+				List<List<String>> needDelResultList = new ArrayList<List<String>>();
+				List<List<String>> aList = aLists.get(index);
+				List<List<String>> bList = bLists.get(index);
+				
+				List<String> head = new ArrayList<String>();
+				head.addAll(aList.get(0));
+				head.add("-------左边是A文件数据，右边是B文件数据-------出现此种情况代表A文件的某行数据根据条件出现在B文件中，先把该行数据删除，并记录在此Sheet页中-------");
+				head.addAll(bList.get(0));
+				needDelResultList.add(head);
+				
+				List<List<String>> needDelList = new ArrayList<List<String>>();
+				
+				for (int i = 0; i < aList.size(); i++) {
+					if (i == 0)
+						continue;
+					List<String> aRow = aList.get(i);
+					if (StringUtils.isBlank(aRow.get(9)))
+						continue;
+					for (int j = 0; j < bList.size(); j++) {
+						if (j == 0)
+							continue;
+						List<String> bRow = bList.get(j);
+						if (StringUtils.isBlank(bRow.get(9)))
+							continue;
+						if ((aRow.get(2) + "," + aRow.get(5) + "," + aRow.get(9).replace("-", "/"))
+						.equals(bRow.get(2) + "," + bRow.get(5) + "," + bRow.get(9).replace("-", "/"))) {
+							needDelList.add(aRow);
+							
+							List<String> needDelResultRow = new ArrayList<String>();
+							needDelResultRow.addAll(aRow);
+							needDelResultRow.add("-------左边是A文件数据，右边是B文件数据-------出现此种情况代表A文件的某行数据根据条件出现在B文件中，先把该行数据删除，并记录在此Sheet页中-------");
+							needDelResultRow.addAll(bRow);
+							needDelResultList.add(needDelResultRow);
+							break;
+						}
+					}
+				}
+				aList.removeAll(needDelList);
+				try {
+					OutputStream os;
+					String fileName = "多国投资_修复重复数据结果.xlsx";
+					if (index == 1) {
+						fileName = "单国投资_修复重复数据结果.xlsx";
+					} else if (index == 2) {
+						fileName = "单国N连投资_修复重复数据结果.xlsx";
+					}
+					String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\修复数据\\" + fileName;
+					
+					os = new FileOutputStream(targetAbsoluteFilePath);
+					XSSFWorkbook wb = new XSSFWorkbook();
+					GuavaExcelUtil.writeDataToExcel(aList, "保留下来的数据", wb, os);
+					if(aList != null)
+						aList = null;// Help GC
+					GuavaExcelUtil.writeDataToExcel(needDelResultList, "被删除的数据", wb, os);
+					if(needDelResultList != null)
+						needDelResultList = null;// Help GC
+					wb.write(os);
+					os.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

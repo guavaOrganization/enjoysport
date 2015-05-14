@@ -29,4 +29,33 @@ public interface IEnterpriseDataService {
 	 * @throws
 	 */
 	public List<List<String>> repairListData(List<List<String>> sourceDatas, int startIndex, int endIndex, int repairStartIndex, int columnStartIndex, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns) throws Exception;
+
+	/**
+	 * 根据Acquiror name到2007年的工业企业数据库中匹配，如果工业企业数据库的企业名字和Acquiror
+	 * name相同，则为同一家企业，则匹配成功
+	 * ，然后把法人代码及其之后的列补充好如果2007年中找不到那个企业，则去2002年工业企业数据中进行匹配，规则相同。
+	 * @since
+	 * @throws
+	 */
+	public void lily20150510_1() throws Exception;
+	
+	public void lily20150510_2() throws Exception;
+	
+	/**
+	 * 	工业企业数据库即2000transformed1文件；海关数据库1月份数据即2000-01文件。
+		匹配步骤：
+		Step 1、筛选装备制造业企业
+		筛选标准:在工业企业数据库中，筛选“行业类别”前两位数为33、34、35、36、37、38、39、40的企业。
+		         在海关数据库中，筛选“海关代码”为71-93的企业。
+		         
+		Step 2、匹配企业。
+		匹配标准一：匹配企业名称。
+		企业名称匹配程度达到85%以上即认为是同一家企业。
+		将匹配好的企业在两大数据库的信息合并（不做整合，只是简单排列，就像上次你帮妹妹做的那样，有个分割线就行）。
+		
+		匹配标准二：匹配电话号码后7位+邮编
+	 * @since
+	 * @throws
+	 */
+	public void odan_20150510(boolean isConcurrent, String tableName, String yearMonth, boolean isBatch , int index, int prodCode, int threshold) throws Exception;
 }

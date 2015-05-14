@@ -1,9 +1,12 @@
 package com.example.lily.service.impls;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
 import com.example.lily.dao.interfaces.IEnterpriseDataDAO;
@@ -335,5 +340,376 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			unmatchResultList = null;// Help GC
 		wb.write(os);
 		os.close();
+	}
+	
+	public void lily20150510_2() throws Exception {
+		List<List<List<String>>> allList = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\数据匹配错误的.xlsx", 3);
+		
+		for (int i = 0; i < allList.size(); i++) {
+			List<List<String>> sheet = allList.get(i);
+			for (int j = 0; j < sheet.size(); j++) {
+				List<String> row = sheet.get(j);
+				if(j == 0)
+					continue;
+				QueryDBResultHolder hodler = enterpriseDataDAO.queryEnterpriseData("t_enterprise_data_2007", "法人单位", row.get(3));
+				if (null == hodler || hodler.getResultDatas() == null || hodler.getResultDatas().size() == 0) {
+					continue;
+				}
+				List<String> result = hodler.getResultDatas().get(0);
+				for (int index = 0; index < result.size(); index++) {
+					if (index + 9 < row.size()) {
+						row.set(index + 9, result.get(index));
+					} else {
+						row.add(result.get(index));
+					}
+				}
+			}
+		}
+		
+		for(int index = 0 ; index < allList.size();index ++ ){
+			List<List<String>> list = allList.get(index);
+			for (int i = 0; i < list.size(); i++) {
+				List<String> row = list.get(i);
+				if (i == 0) {
+					row.add(3, "是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
+					row.add(4, "是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
+					row.add(16, "是否为我国东部地区(1:东部地区;0:非东部地区)");
+					continue;
+				}
+				if(row.size() < 150)
+					continue;
+				String isAsiaCountry = "0";
+				if (ASIA_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为亚洲国家
+					isAsiaCountry = "1";
+				} else {
+					isAsiaCountry = "0";
+				}
+				String isDeveloped = "0";
+				if (DEVELOPED_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为高收入国家
+					isDeveloped = "1";
+				} else {
+					isDeveloped = "0";
+				}
+				String isEastArea = "0";
+				if (EAST_AREA.indexOf(row.get(13)) >= 0) { // 是否为我国东部地区
+					isEastArea = "1";
+				} else {
+					isEastArea = "0";
+				}
+				row.add(3, isAsiaCountry);
+				row.add(4, isDeveloped);
+				row.add(16, isEastArea);
+			}
+		}
+		
+		try {
+			OutputStream os;
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\数据匹配错误的_根据2007年的MDB匹配后的结果.xlsx";
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			for (int index = 0; index < allList.size(); index++) {
+				List<List<String>> list = allList.get(index);
+				GuavaExcelUtil.writeDataToExcel(list, index + "", wb, os);
+				if (list != null)
+					list = null;// Help GC
+			}
+			wb.write(os);
+			os.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void lily20150510_1() throws Exception {
+//		List<List<List<String>>> allList = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\数据补齐企业.xlsx", 2);
+		List<List<List<String>>> allList = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\数据匹配错误的.xlsx", 3);
+
+		for (int i = 0; i < allList.size(); i++) {
+			List<List<String>> sheet = allList.get(i);
+			boolean setedHead = false;
+			for (int j = 0; j < sheet.size(); j++) {
+				List<String> row = sheet.get(j);
+				if(j == 0)
+					continue;
+				QueryDBResultHolder hodler = enterpriseDataDAO.queryEnterpriseData("t_enterprise_data_2002", "法人单位", row.get(3));
+				if (null == hodler || hodler.getResultDatas() == null || hodler.getResultDatas().size() == 0) {
+					continue;
+				}
+				
+				if (!setedHead) {
+					List<String> head = sheet.get(0);
+					List<String> result = hodler.getResultMetaDatas();
+					for (int index = 0; index < result.size(); index++) {
+						head.set(index + 9, result.get(index));
+					}
+					setedHead = true;
+				}
+				
+				List<String> result = hodler.getResultDatas().get(0);
+				for (int index = 0; index < result.size(); index++) {
+					if (index + 9 < row.size()) {
+						row.set(index + 9, result.get(index));
+					} else {
+						row.add(result.get(index));
+					}
+				}
+			}
+		}
+		
+		for(int index = 0 ; index < allList.size();index ++ ){
+			List<List<String>> list = allList.get(index);
+			for (int i = 0; i < list.size(); i++) {
+				List<String> row = list.get(i);
+				if (i == 0) {
+					row.add(3, "是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
+					row.add(4, "是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
+					// row.add(16, "是否为我国东部地区(1:东部地区;0:非东部地区)");
+					continue;
+				}
+				
+				String isAsiaCountry = "0";
+				if (ASIA_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为亚洲国家
+					isAsiaCountry = "1";
+				} else {
+					isAsiaCountry = "0";
+				}
+				String isDeveloped = "0";
+				if (DEVELOPED_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为高收入国家
+					isDeveloped = "1";
+				} else {
+					isDeveloped = "0";
+				}
+//				String isEastArea = "0";
+//				if (EAST_AREA.indexOf(row.get(13)) >= 0) { // 是否为我国东部地区
+//					isEastArea = "1";
+//				} else {
+//					isEastArea = "0";
+//				}
+				row.add(3, isAsiaCountry);
+				row.add(4, isDeveloped);
+//				row.add(16, isEastArea);
+			}
+		}
+		
+		try {
+			OutputStream os;
+//			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\数据补齐企业_修复后的数据.xlsx";
+			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\数据匹配错误的_根据2007年的MDB匹配后的结果.xlsx";
+			
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			for (int index = 0; index < allList.size(); index++) {
+				List<List<String>> list = allList.get(index);
+				GuavaExcelUtil.writeDataToExcel(list, index + "", wb, os);
+				if (list != null)
+					list = null;// Help GC
+			}
+			wb.write(os);
+			os.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 	工业企业数据库即2000transformed1文件；海关数据库1月份数据即2000-01文件。
+		匹配步骤：
+		Step 1、筛选装备制造业企业
+		筛选标准:在工业企业数据库中，筛选“行业类别”前两位数为33、34、35、36、37、38、39、40的企业。
+		         在海关数据库中，筛选“海关代码”为71-93的企业。
+		         
+		Step 2、匹配企业。
+		匹配标准一：匹配企业名称。
+		企业名称匹配程度达到85%以上即认为是同一家企业。
+		将匹配好的企业在两大数据库的信息合并（不做整合，只是简单排列，就像上次你帮妹妹做的那样，有个分割线就行）。
+		
+		匹配标准二：匹配电话号码后7位+邮编
+	 * @since
+	 * @throws
+	 */
+	public void odan_20150510(boolean isConcurrent, String tableName, String yearMonth, boolean isBatch, int index, int prodCode, int threshold) throws Exception {
+		// 没时间想优化的方案，怎么简单怎么来
+		String sql = "select * from odan_transformed_2001 where 行业类别  like :codition" + index;
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource("codition" + index, index + "%");
+		
+		QueryDBResultHolder holder = enterpriseDataDAO.query(sql, namedParameters);
+		List<List<String>> sourceList = holder.getResultDatas();
+		if (null == sourceList || sourceList.size() == 0)
+			return;
+		
+		String customsSQL = "select * from " + tableName + " where 产品代码 like :codition" + prodCode;
+		MapSqlParameterSource params = new MapSqlParameterSource("codition" + prodCode, prodCode + "%");
+		QueryDBResultHolder customsHolder = enterpriseDataDAO.query(customsSQL, params);
+		List<List<String>> destList = customsHolder.getResultDatas();
+		if(destList == null || destList.size() == 0)
+			return;
+
+		
+		// 开始匹配
+		List<String> head = new ArrayList<String>();
+		head.addAll(holder.getResultMetaDatas());
+		head.add("--------左边是工业企业数据库数据，右边是海关数据-----------------");
+		head.add("--------成功条件--------");
+		head.addAll(customsHolder.getResultMetaDatas());
+		
+		int nThread = 1;
+		if (isConcurrent) { // 计算线程数
+			if (sourceList.size() <= 500)
+				nThread = 1;
+			else if (sourceList.size() <= 1000)
+				nThread = 2;
+			else if (sourceList.size() <= 2000)
+				nThread = 3;
+			else
+				nThread = 4;
+		}
+		
+		ExecutorService executorService = Executors.newFixedThreadPool(nThread);
+		List<Future<List<List<String>>>> futures = new ArrayList<Future<List<List<String>>>>(nThread);
+		int count = sourceList.size();
+		for (int matchIndex = 0; matchIndex < nThread; matchIndex++) {
+			int start = matchIndex * (count / nThread);// 开始下标
+			int end = 0;
+			if (matchIndex == nThread - 1) {
+				end = (matchIndex + 1) * (count / nThread) + count % nThread;
+			} else {
+				end = (matchIndex + 1) * (count / nThread);
+			}
+			futures.add(executorService.submit(new OdanCallable(tableName, index, prodCode, start, end, sourceList, destList)));
+		}
+		
+		
+		try {
+			for (int i = 0; i < futures.size(); i++) {
+				List<List<String>> matchedResultList = futures.get(i).get();
+				OutputStream os;
+				String targetAbsoluteFilePath = "E:\\lily_mcfly\\odan\\"
+						+ yearMonth + "\\" + tableName + "_" + index + "_"
+						+ prodCode + "_" + i + ".xlsx";
+				
+				os = new FileOutputStream(targetAbsoluteFilePath);
+				XSSFWorkbook wb = new XSSFWorkbook();
+				matchedResultList.add(0, head);
+				GuavaExcelUtil.writeDataToExcel(matchedResultList, "匹配到结果的数据", wb, os);
+				if (matchedResultList != null)
+					matchedResultList = null;// Help GC
+				wb.write(os);
+				os.close();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		executorService.shutdownNow();
+	}
+	
+	public static class OdanCallable implements Callable<List<List<String>>>{
+		private int startIndex;
+		private int endIndex;
+		private List<List<String>> sourceList;
+		private List<List<String>> destList;
+		private String tableName;
+		private int index;
+		private int prodCode;
+
+		public OdanCallable(String tableName, int index, int prodCode,
+				int startIndex, int endIndex, List<List<String>> sourceList,
+				List<List<String>> destList) {
+			this.startIndex = startIndex;
+			this.endIndex = endIndex;
+			this.sourceList = sourceList;
+			this.destList = destList;
+			this.tableName = tableName;
+			this.index = index;
+			this.prodCode = prodCode;
+		}
+		
+		@Override
+		public List<List<String>> call() throws Exception {
+			List<List<String>> matchedResultList = new ArrayList<List<String>>();
+			for (int i = startIndex; i < endIndex; i++) {
+				List<String> sourceRow = sourceList.get(i);
+				for (int j = 0; j < destList.size(); j++) {
+					List<String> destRow = destList.get(j);
+					boolean isMatch = false;
+					int matchResult = odanMatching(sourceRow.get(1), destRow.get(15), tableName, index, prodCode, 85);
+					if (1 == matchResult) { // 精确匹配
+						isMatch = true;
+					} else if (0 == matchResult || 2 == matchResult) {// 模糊匹配，需要根据"电话号码后7位+邮编"在匹配
+						String sourcePhoneNumber = sourceRow.get(3);// 工业企业数据库中的电话号码
+						if(StringUtils.isBlank(sourcePhoneNumber) || sourcePhoneNumber.length() < 7)
+							isMatch = false;
+						else {
+							String destPhoneNumber = destRow.get(17);// 海关数据中的电话号码
+							if (StringUtils.isBlank(destPhoneNumber) || destPhoneNumber.length() < 7)
+								isMatch = false;
+							else if ((sourcePhoneNumber.substring(sourcePhoneNumber.length() - 7, sourcePhoneNumber.length()) + sourceRow.get(4)).equals(destPhoneNumber.substring(destPhoneNumber.length() - 7, destPhoneNumber.length()) + destRow.get(19))) {
+								isMatch = true;
+								if (0 == matchResult) {
+									matchResult = 3;
+								}
+							}
+						}
+					}
+					
+					if (isMatch) {
+						System.out.println("正在处理：开始下标[" + startIndex + "]，结束下标[" + endIndex + "],第：[" + i + "]条数据,匹配结果：" + matchResult);
+						List<String> matchResultRow = new ArrayList<String>();
+						matchResultRow.addAll(sourceRow);
+						matchResultRow.add("--------左边是工业企业数据库数据，右边是海关数据-----------------");
+						if (matchResult == 1) {// 精确匹配
+							matchResultRow.add("精确匹配--[企业名称一致]");
+						} else if (matchResult == 2) {
+							matchResultRow.add("模糊匹配--[企业名称的模糊匹配 ] + [电话号码后7位+邮编]双重匹配");
+						} else if (matchResult == 3) {
+							matchResultRow.add("末尾匹配--[电话号码后7位+邮编]");
+						} else {
+							matchResultRow.add("");
+						}
+						matchResultRow.addAll(destRow);
+						matchedResultList.add(matchResultRow);
+					}
+				}
+			}
+			return matchedResultList;
+		}
+	}
+	
+	public static int odanMatching(String source, String dest, String tableName, int index, int prodCode, int threshold) {
+		System.out.println("source : " + source + " **** dest : " + dest);
+		if(StringUtils.isBlank(source) || StringUtils.isBlank(dest))
+			return 0;
+		
+		if (source.equals(dest))
+			return 1;
+		
+		source.replaceAll("（", "").replaceAll("）", "").replaceAll("-", "")
+				.replaceAll("有限责任公司", "").replaceAll("股份有限公司", "")
+				.replaceAll("工业有限公司", "").replaceAll("集团有限公司", "")
+				.replaceAll("有限公司", "").replaceAll("集团", "")
+				.replaceAll("厂", "");
+		dest.replaceAll("（", "").replaceAll("）", "").replaceAll("-", "")
+				.replaceAll("有限责任公司", "").replaceAll("股份有限公司", "")
+				.replaceAll("工业有限公司", "").replaceAll("集团有限公司", "")
+				.replaceAll("有限公司", "").replaceAll("集团", "")
+				.replaceAll("厂", "");
+		System.out.println("修复后的source : " + source + " **** 修复后的dest : " + dest);
+		if (source.equals(dest))
+			return 1;
+		
+		char[] sourceChar = source.toCharArray();
+		double count = 0;
+		for (int i = 0; i < sourceChar.length; i++) {
+			if (dest.indexOf(sourceChar[i]) >= 0) {
+				count++;
+			}
+		}
+		double percentage = (count / sourceChar.length) * 100;
+		return percentage - threshold >= 0 ? 2 : 0;
 	}
 }
