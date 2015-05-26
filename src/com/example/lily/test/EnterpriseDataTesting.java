@@ -609,17 +609,24 @@ public class EnterpriseDataTesting {
 	
 	@Test
 	public void odan_20150510() {
-		for (int index = 1; index <= 12; index++) {
-			String yearMonth = "2001" + (index < 10 ? "0" + index : index);
-			String tableName = "odan_customs_" + yearMonth;
-			try {
-				for (int i = 33; i <= 40; i++) {
-					for (int j = 84; j <= 92; j++) {
-						enterpriseDataService.odan_20150510(true, tableName, yearMonth, false, i, j, 85);
+		for (int year = 2005; year < 2006; year++) {
+			String sourceTable = "odan_transformed_" + year;
+			for (int index = 13; index <= 13; index++) {
+				String yearMonth = year + "" + (index < 10 ? "0" + index : index);
+				String destTable = "odan_customs_" + yearMonth;
+				try {
+					for (int i = 33; i <= 40; i++) {
+						if (i <= 36)
+							continue;
+						for (int j = 84; j <= 92; j++) {
+							if (i == 37 && j <= 89)
+								continue;
+							enterpriseDataService.odan_20150510(true, sourceTable, destTable, yearMonth, false, i, j, 85);
+						}
 					}
+				} catch (Exception e) { 
+					e.printStackTrace();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 	}

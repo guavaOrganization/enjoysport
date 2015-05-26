@@ -8,18 +8,6 @@ package com.example.javalang;
  * 
  */
 public class StaticDispatch {
-	static abstract class Human {
-
-	}
-
-	static class Man extends Human {
-
-	}
-
-	static class Woman extends Human {
-
-	}
-
 	public void sayHello(Human guy) {
 		System.out.println("hello,guy");
 	}
@@ -49,7 +37,7 @@ public class StaticDispatch {
 		Human woman = new Woman();
 		StaticDispatch dispatch = new StaticDispatch();
 		dispatch.sayHello(man);
-		dispatch.sayHello(woman);
+		dispatch.sayHello(woman); // 编译器就已经确定了
 		dispatch.sayHello(new Man());
 		dispatch.sayHello(new Woman());
 		System.out.println("=======================");

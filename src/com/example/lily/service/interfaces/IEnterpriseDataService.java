@@ -57,5 +57,5 @@ public interface IEnterpriseDataService {
 	 * @since
 	 * @throws
 	 */
-	public void odan_20150510(boolean isConcurrent, String tableName, String yearMonth, boolean isBatch , int index, int prodCode, int threshold) throws Exception;
+	public void odan_20150510(boolean isConcurrent, String sourceTable, String tableName, String yearMonth, boolean isBatch , int index, int prodCode, int threshold) throws Exception;
 }

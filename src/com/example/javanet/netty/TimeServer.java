@@ -25,7 +25,7 @@ public class TimeServer {
 			b.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class) // 对应Java NIO中的ServerSocketChannel类
 					.option(ChannelOption.SO_BACKLOG, 1024)
-					.childHandler(new ChildChannelHandler()); // 绑定I/O事件处理类，用于处理网络I/O时间，例如记录日志，对消息进行编解码等。
+					.childHandler(new ChildChannelHandler()); // 绑定I/O事件处理类，用于处理网络I/O事件，例如记录日志，对消息进行编解码等。
 			// 绑定端口，同步等待成功
 			ChannelFuture f = b.bind(port).sync();// bind方法绑定监听端口。调用同步阻塞方法sync等待绑定操作完成。
 			// ChannelFuture类似于java.util.concurrent.Future,主要用于异步操作的通知回调

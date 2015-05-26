@@ -69,6 +69,31 @@ public class GuavaExcelUtil {
 		}
 	}
 	
+	public static void writeDataToExcel(int startIndex, int endIndex, List<String> head, List<List<String>> dataList, String sheetName, XSSFWorkbook wb, OutputStream os) throws IOException {
+		if (null == wb) {
+			throw new IllegalArgumentException("XSSFWorkbook不允许为空");
+		}
+		if (null == os) {
+			throw new IllegalArgumentException("OutputStream不允许为空");
+		}
+		int writingRowIndex = 0;
+		XSSFSheet sheet = wb.createSheet(sheetName); // 创建Sheet页
+		if (null != head) {
+			XSSFRow row = sheet.createRow(writingRowIndex++);
+			for (int j = 0; j < head.size(); j++) {
+				row.createCell(j).setCellValue(head.get(j));
+			}
+		}
+		
+		for (int i = startIndex; i < endIndex; i++) {
+			List<String> datas = dataList.get(i);
+			XSSFRow row = sheet.createRow(writingRowIndex++);
+			for (int j = 0; j < datas.size(); j++) {
+				row.createCell(j).setCellValue(datas.get(j));
+			}
+		}
+	}
+	
 	public static List<List<String>> loadExcelDataToList(String absolutePath) {
 		return loadExcelDataToList(absolutePath, 1).get(0);
 	}

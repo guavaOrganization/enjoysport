@@ -1,5 +1,6 @@
 package com.example.lily.service.impls;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +20,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
 import com.example.lily.dao.interfaces.IEnterpriseDataDAO;
@@ -531,17 +531,20 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 	 * @since
 	 * @throws
 	 */
-	public void odan_20150510(boolean isConcurrent, String tableName, String yearMonth, boolean isBatch, int index, int prodCode, int threshold) throws Exception {
+	public void odan_20150510(boolean isConcurrent, String sourceTable, String tableName, String yearMonth, boolean isBatch, int index, int prodCode, int threshold) throws Exception {
 		// 没时间想优化的方案，怎么简单怎么来
-		String sql = "select * from odan_transformed_2001 where 行业类别  like :codition" + index;
+		String sql = "select * from " + sourceTable + " where 行业类别  like :codition" + index;
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource("codition" + index, index + "%");
 		
 		QueryDBResultHolder holder = enterpriseDataDAO.query(sql, namedParameters);
 		List<List<String>> sourceList = holder.getResultDatas();
 		if (null == sourceList || sourceList.size() == 0)
 			return;
+		String customsSQL = "select * from " + tableName + " where 产品码 like :codition" + prodCode;
+		if ("odan_customs_200512".equals(tableName) || "odan_customs_200513".equals(tableName)) {
+			customsSQL = "select * from " + tableName + " where HS编码   like :codition" + prodCode;
+		}
 		
-		String customsSQL = "select * from " + tableName + " where 产品代码 like :codition" + prodCode;
 		MapSqlParameterSource params = new MapSqlParameterSource("codition" + prodCode, prodCode + "%");
 		QueryDBResultHolder customsHolder = enterpriseDataDAO.query(customsSQL, params);
 		List<List<String>> destList = customsHolder.getResultDatas();
@@ -558,16 +561,14 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		
 		int nThread = 1;
 		if (isConcurrent) { // 计算线程数
-			if (sourceList.size() <= 500)
-				nThread = 1;
-			else if (sourceList.size() <= 1000)
+			if (sourceList.size() <= 100)
 				nThread = 2;
-			else if (sourceList.size() <= 2000)
-				nThread = 3;
-			else
-				nThread = 4;
+			else if (sourceList.size() <= 1000)
+				nThread = 10;
+			else 
+				nThread = 10;
 		}
-		
+		nThread = 4;
 		ExecutorService executorService = Executors.newFixedThreadPool(nThread);
 		List<Future<List<List<String>>>> futures = new ArrayList<Future<List<List<String>>>>(nThread);
 		int count = sourceList.size();
@@ -582,24 +583,46 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			futures.add(executorService.submit(new OdanCallable(tableName, index, prodCode, start, end, sourceList, destList)));
 		}
 		
-		
 		try {
+			List<List<String>> allMatchedResultList = new ArrayList<List<String>>(); 
 			for (int i = 0; i < futures.size(); i++) {
 				List<List<String>> matchedResultList = futures.get(i).get();
+				if(matchedResultList.size() > 0)
+					allMatchedResultList.addAll(matchedResultList);
+			}
+			if (allMatchedResultList.size() == 0)
+				return;
+			System.out.println("========================数据匹配结束，生成Excel结果===========================");
+			System.out.println("allMatchedResultList   长度 ---->>>>" + allMatchedResultList.size());
+			int resultSize = allMatchedResultList.size();
+			int fileCount = resultSize / 4000;
+			if (resultSize % 4000 != 0)
+				fileCount++;
+			System.out.println("==================需要将结果分解为【" + fileCount + "】个文件======================");
+
+			String targetAbsoluteFileDir = "E:\\lily_mcfly\\odan\\" + yearMonth;
+			File file = new File(targetAbsoluteFileDir);
+			if(!file.exists())
+				file.mkdir();
+			
+			for (int i = 0; i < fileCount; i++) {
 				OutputStream os;
-				String targetAbsoluteFilePath = "E:\\lily_mcfly\\odan\\"
-						+ yearMonth + "\\" + tableName + "_" + index + "_"
-						+ prodCode + "_" + i + ".xlsx";
-				
+				int start = i * (resultSize / fileCount);// 开始下标
+				int end = 0;
+				if (i == fileCount - 1) {
+					end = (i + 1) * (resultSize / fileCount) + resultSize % fileCount;
+				} else {
+					end = (i + 1) * (resultSize / fileCount);
+				}
+				System.out.println("生成文件，文件开始下标为：【" + start + "】,结束下标为【" + end + "】");
+				String targetAbsoluteFilePath = targetAbsoluteFileDir + "\\" + tableName + "_" + index + "_" + prodCode + "_" + i + ".xlsx";
 				os = new FileOutputStream(targetAbsoluteFilePath);
 				XSSFWorkbook wb = new XSSFWorkbook();
-				matchedResultList.add(0, head);
-				GuavaExcelUtil.writeDataToExcel(matchedResultList, "匹配到结果的数据", wb, os);
-				if (matchedResultList != null)
-					matchedResultList = null;// Help GC
+				GuavaExcelUtil.writeDataToExcel(start, end, head, allMatchedResultList, "匹配到结果的数据", wb, os);
 				wb.write(os);
 				os.close();
 			}
+			allMatchedResultList = null;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -632,23 +655,39 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		@Override
 		public List<List<String>> call() throws Exception {
 			List<List<String>> matchedResultList = new ArrayList<List<String>>();
+			int destIndex1 = 15;
+			int destIndex2 = 17;
+			int destIndex3 = 19;
+			
+			int sourceIndex1 = 1;
+			int sourceIndex2 = 3;
+			int sourceIndex3 = 4;
+			if ("odan_customs_200512".equals(tableName) || "odan_customs_200513".equals(tableName)) {
+				destIndex1 = 9;
+				destIndex2 = 11;
+				destIndex3 = 13;
+			}			
 			for (int i = startIndex; i < endIndex; i++) {
+				System.out.println("正在处理：tableName为[" + tableName
+						+ "], index 为 [" + index + "], prodCode 为 [" + prodCode
+						+ "] 中 开始下标[" + startIndex + "]，结束下标[" + endIndex
+						+ "],第：[" + i + "]条数据");
 				List<String> sourceRow = sourceList.get(i);
 				for (int j = 0; j < destList.size(); j++) {
 					List<String> destRow = destList.get(j);
 					boolean isMatch = false;
-					int matchResult = odanMatching(sourceRow.get(1), destRow.get(15), tableName, index, prodCode, 85);
+					int matchResult = odanMatching(sourceRow.get(sourceIndex1), destRow.get(destIndex1), tableName, index, prodCode, 85);
 					if (1 == matchResult) { // 精确匹配
 						isMatch = true;
 					} else if (0 == matchResult || 2 == matchResult) {// 模糊匹配，需要根据"电话号码后7位+邮编"在匹配
-						String sourcePhoneNumber = sourceRow.get(3);// 工业企业数据库中的电话号码
+						String sourcePhoneNumber = sourceRow.get(sourceIndex2);// 工业企业数据库中的电话号码
 						if(StringUtils.isBlank(sourcePhoneNumber) || sourcePhoneNumber.length() < 7)
 							isMatch = false;
 						else {
-							String destPhoneNumber = destRow.get(17);// 海关数据中的电话号码
+							String destPhoneNumber = destRow.get(destIndex2);// 海关数据中的电话号码
 							if (StringUtils.isBlank(destPhoneNumber) || destPhoneNumber.length() < 7)
 								isMatch = false;
-							else if ((sourcePhoneNumber.substring(sourcePhoneNumber.length() - 7, sourcePhoneNumber.length()) + sourceRow.get(4)).equals(destPhoneNumber.substring(destPhoneNumber.length() - 7, destPhoneNumber.length()) + destRow.get(19))) {
+							else if ((sourcePhoneNumber.substring(sourcePhoneNumber.length() - 7, sourcePhoneNumber.length()) + sourceRow.get(sourceIndex3)).equals(destPhoneNumber.substring(destPhoneNumber.length() - 7, destPhoneNumber.length()) + destRow.get(destIndex3))) {
 								isMatch = true;
 								if (0 == matchResult) {
 									matchResult = 3;
@@ -658,7 +697,6 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 					}
 					
 					if (isMatch) {
-						System.out.println("正在处理：开始下标[" + startIndex + "]，结束下标[" + endIndex + "],第：[" + i + "]条数据,匹配结果：" + matchResult);
 						List<String> matchResultRow = new ArrayList<String>();
 						matchResultRow.addAll(sourceRow);
 						matchResultRow.add("--------左边是工业企业数据库数据，右边是海关数据-----------------");
@@ -681,35 +719,60 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 	}
 	
 	public static int odanMatching(String source, String dest, String tableName, int index, int prodCode, int threshold) {
-		System.out.println("source : " + source + " **** dest : " + dest);
 		if(StringUtils.isBlank(source) || StringUtils.isBlank(dest))
 			return 0;
-		
 		if (source.equals(dest))
 			return 1;
-		
-		source.replaceAll("（", "").replaceAll("）", "").replaceAll("-", "")
-				.replaceAll("有限责任公司", "").replaceAll("股份有限公司", "")
-				.replaceAll("工业有限公司", "").replaceAll("集团有限公司", "")
-				.replaceAll("有限公司", "").replaceAll("集团", "")
-				.replaceAll("厂", "");
-		dest.replaceAll("（", "").replaceAll("）", "").replaceAll("-", "")
-				.replaceAll("有限责任公司", "").replaceAll("股份有限公司", "")
-				.replaceAll("工业有限公司", "").replaceAll("集团有限公司", "")
-				.replaceAll("有限公司", "").replaceAll("集团", "")
-				.replaceAll("厂", "");
-		System.out.println("修复后的source : " + source + " **** 修复后的dest : " + dest);
-		if (source.equals(dest))
-			return 1;
-		
-		char[] sourceChar = source.toCharArray();
-		double count = 0;
-		for (int i = 0; i < sourceChar.length; i++) {
-			if (dest.indexOf(sourceChar[i]) >= 0) {
+		return calculatePercentage(source, dest) - threshold >= 0 ? 2 : 0;
+	}
+	
+	public static int findLastIndex(String str) {
+		int lastIndex = str.lastIndexOf("有限责任公司");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		lastIndex = str.lastIndexOf("股份有限公司");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		lastIndex = str.lastIndexOf("工业有限公司");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		lastIndex = str.lastIndexOf("集团有限公司");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		lastIndex = str.lastIndexOf("有限公司");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		lastIndex = str.lastIndexOf("集团");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		lastIndex = str.lastIndexOf("厂");
+		if (lastIndex >= 0) {
+			return lastIndex;
+		}
+		return str.length();
+	}
+	
+	public static double calculatePercentage(String source, String dest) {
+		char[] chars = source.toCharArray();
+		int ignoreIndex = findLastIndex(source); // ignoreIndex 不在计算之内
+		int ignoreCount = 0; // 特殊字符不考虑在内
+		int count = 0;// 匹配到的个数
+		for (int i = 0; i < ignoreIndex; i++) {
+			if (chars[i] == '-' || chars[i] == '(' || chars[i] == ')'
+					|| chars[i] == '（' || chars[i] == '）') {
+				ignoreCount++;
+				continue;
+			}
+			if(dest.indexOf(chars[i]) >= 0){
 				count++;
 			}
 		}
-		double percentage = (count / sourceChar.length) * 100;
-		return percentage - threshold >= 0 ? 2 : 0;
+		return ((double) count/ (ignoreIndex - ignoreCount)) * 100;
 	}
 }
