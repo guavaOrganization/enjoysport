@@ -540,11 +540,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		List<List<String>> sourceList = holder.getResultDatas();
 		if (null == sourceList || sourceList.size() == 0)
 			return;
-		String customsSQL = "select * from " + tableName + " where 产品码 like :codition" + prodCode;
-		if ("odan_customs_200512".equals(tableName) || "odan_customs_200513".equals(tableName)) {
-			customsSQL = "select * from " + tableName + " where HS编码   like :codition" + prodCode;
-		}
-		
+		String customsSQL = "select * from " + tableName + " where 税号编码 like :codition" + prodCode;
 		MapSqlParameterSource params = new MapSqlParameterSource("codition" + prodCode, prodCode + "%");
 		QueryDBResultHolder customsHolder = enterpriseDataDAO.query(customsSQL, params);
 		List<List<String>> destList = customsHolder.getResultDatas();
@@ -568,7 +564,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			else 
 				nThread = 10;
 		}
-		nThread = 4;
+		nThread = 3;
 		ExecutorService executorService = Executors.newFixedThreadPool(nThread);
 		List<Future<List<List<String>>>> futures = new ArrayList<Future<List<List<String>>>>(nThread);
 		int count = sourceList.size();
@@ -662,11 +658,9 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			int sourceIndex1 = 1;
 			int sourceIndex2 = 3;
 			int sourceIndex3 = 4;
-			if ("odan_customs_200512".equals(tableName) || "odan_customs_200513".equals(tableName)) {
-				destIndex1 = 9;
-				destIndex2 = 11;
-				destIndex3 = 13;
-			}			
+			destIndex1 = 9;
+			destIndex2 = 11;
+			destIndex3 = 13;
 			for (int i = startIndex; i < endIndex; i++) {
 				System.out.println("正在处理：tableName为[" + tableName
 						+ "], index 为 [" + index + "], prodCode 为 [" + prodCode
