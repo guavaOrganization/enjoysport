@@ -2,6 +2,8 @@ package com.example.lily.service.interfaces;
 
 import java.util.List;
 
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+
 import com.example.lily.javabeans.MatchingResultHolder;
 import com.example.lily.javabeans.QueryDBResultHolder;
 
@@ -58,4 +60,6 @@ public interface IEnterpriseDataService {
 	 * @throws
 	 */
 	public void odan_20150510(boolean isConcurrent, String sourceTable, String tableName, String yearMonth, boolean isBatch , int index, int prodCode, int threshold) throws Exception;
+
+	public QueryDBResultHolder step8(String sql, MapSqlParameterSource namedParameters) throws Exception;
 }

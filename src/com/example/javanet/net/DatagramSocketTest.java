@@ -22,8 +22,8 @@ public class DatagramSocketTest {
 			byte[] data = new byte[1024];
 			DatagramPacket response = new DatagramPacket(data, data.length);
 			
-			socket.send(request);;
-			socket.receive(response);// 无限阻塞，知道一个UDP数据报到达
+			socket.send(request);
+			socket.receive(response);// 无限阻塞，直到一个UDP数据报到达
 
 			String result = new String(response.getData(), 0, response.getLength(), "UTF-8");
 			System.out.println(result);

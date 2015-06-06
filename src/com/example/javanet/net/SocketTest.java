@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 
 public class SocketTest {
 	/**
-	 * Socket.close()方法同事关闭Socket的输出和输入。有时你可能希望只关闭连接的一般，即输入或者输出。shutdownInput()和shutdownOutput()方法可以只关闭连接一半。
+	 * Socket.close()方法同时关闭Socket的输出和输入。有时你可能希望只关闭连接的一半，即输入或者输出。shutdownInput()和shutdownOutput()方法可以只关闭连接一半。
 	 * 这并不关闭Socket。实际上，它会调整与Socket连接的流，使它认为已经到了流的末端。
 	 * 关闭输入之后再读取输入流会返回-1.关闭输出之后再写入Socket会抛出一个IOException异常。
 	 * 注意：即使半关闭了连接，或将连接的两半都关闭，使用结束后仍需要关闭该Socket。shutdown方法只影响Socket的流。它们并不释放与Socket关联的资源，如占用的端口等。

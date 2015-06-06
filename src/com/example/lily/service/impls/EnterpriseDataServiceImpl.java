@@ -658,9 +658,9 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			int sourceIndex1 = 1;
 			int sourceIndex2 = 3;
 			int sourceIndex3 = 4;
-			destIndex1 = 9;
-			destIndex2 = 11;
-			destIndex3 = 13;
+			destIndex1 = 11;
+			destIndex2 = 13;
+			destIndex3 = 15;
 			for (int i = startIndex; i < endIndex; i++) {
 				System.out.println("正在处理：tableName为[" + tableName
 						+ "], index 为 [" + index + "], prodCode 为 [" + prodCode
@@ -768,5 +768,11 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			}
 		}
 		return ((double) count/ (ignoreIndex - ignoreCount)) * 100;
+	}
+	
+	
+	public QueryDBResultHolder step8(String sql,MapSqlParameterSource namedParameters) throws Exception {
+		QueryDBResultHolder holder = enterpriseDataDAO.query(sql, namedParameters);
+		return holder;
 	}
 }

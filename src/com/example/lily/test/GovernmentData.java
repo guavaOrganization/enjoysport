@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,8 +19,11 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
+import com.example.lily.javabeans.QueryDBResultHolder;
 import com.example.lily.service.impls.EnterpriseDataServiceImpl;
+import com.example.lily.service.interfaces.IEnterpriseDataService;
 import com.guava.util.GuavaExcelUtil;
 
 public class GovernmentData {
@@ -28,7 +32,220 @@ public class GovernmentData {
 	public static final String WEST_AREA = "四川省,重庆市,贵州省,云南省,西藏自治区,陕西省,甘肃省,青海省,宁夏回族自治区,新疆维吾尔自治区,广西壮族自治区,内蒙古自治区";
 	public static final String CONTROL_AREA = "商务部,中央企业";
 
-	public static void main(String[] args) throws Exception {
+	public static class Step8Callable implements Callable<String> {
+		private List<List<String>> list;
+		private String fileName;
+		private IEnterpriseDataService enterpriseDataService;
+		private CountDownLatch latch;
+
+		public Step8Callable(List<List<String>> list, String fileName,
+				IEnterpriseDataService enterpriseDataService,
+				CountDownLatch latch) {
+			this.list = list;
+			this.fileName = fileName;
+			this.enterpriseDataService = enterpriseDataService;
+			this.latch = latch;
+		}
+		
+		@Override
+		public String call() throws Exception {
+			System.out.println("共需要处理------------>" + (list.size() - 1) + "行数据");
+			List<List<String>> notFindlist = new ArrayList<List<String>>();
+			List<String> head = list.get(0);
+			notFindlist.add(head);
+			List<List<String>> list_1998 = new ArrayList<List<String>>();
+			List<List<String>> list_1999 = new ArrayList<List<String>>();
+			List<List<String>> list_2000 = new ArrayList<List<String>>();
+			List<List<String>> list_2001 = new ArrayList<List<String>>();
+			List<List<String>> list_2003 = new ArrayList<List<String>>();
+			List<List<String>> list_2004 = new ArrayList<List<String>>();
+			List<List<String>> list_2005 = new ArrayList<List<String>>();
+			List<List<String>> list_2006 = new ArrayList<List<String>>();
+			List<List<String>> list_2008 = new ArrayList<List<String>>();
+			List<List<String>> list_2009 = new ArrayList<List<String>>();
+			
+			for (int j = 0; j < list.size(); j++) {
+				if (j == 0)
+					continue;
+				List<String> row = list.get(j);
+				String key = row.get(5);
+				key = key == null || "".equals(key.trim()) ? "" : key.trim();
+				System.out.println("正在处理【" + fileName + "】,第【" + j + "】行数据,key ---->" + key);
+				
+				boolean isFind = false;
+				if (key.length() != 0) {
+					for (int year = 1998; year <= 2009; year++) {
+						if (year == 2002 || year == 2007)
+							continue;
+						String sql = createQuerySQL(year);
+						MapSqlParameterSource namedParameters = new MapSqlParameterSource("codition", key);
+						QueryDBResultHolder resultHolder = enterpriseDataService.step8(sql, namedParameters);
+						List<List<String>> sourceList = resultHolder.getResultDatas();
+						if (null == sourceList || sourceList.size() == 0)
+							continue;
+						List<String> resultHead = resultHolder.getResultMetaDatas();
+
+						isFind = true;
+						
+						List<String> title = new ArrayList<String>();
+						title.addAll(head);
+						title.add("---------------------分割线-----------------");
+						title.addAll(resultHead);
+
+						List<String> resultRow = new ArrayList<String>();
+						resultRow.addAll(row);
+						resultRow.add("---------------------分割线-----------------");
+						resultRow.addAll(sourceList.get(0));
+						
+						if (year == 1998) {
+							if (list_1998.size() == 0) {
+								list_1998.add(title);
+							}
+							list_1998.add(resultRow);
+						} else if (year == 1999) {
+							if (list_1999.size() == 0) {
+								list_1999.add(title);
+							}
+							list_1999.add(resultRow);
+						} else if (year == 2000) {
+							if (list_2000.size() == 0) {
+								list_2000.add(title);
+							}
+							list_2000.add(resultRow);
+						} else if (year == 2001) {
+							if (list_2001.size() == 0) {
+								list_2001.add(title);
+							}
+							list_2001.add(resultRow);
+						} else if (year == 2003) {
+							if (list_2003.size() == 0) {
+								list_2003.add(title);
+							}
+							list_2003.add(resultRow);
+						} else if (year == 2004) {
+							if (list_2004.size() == 0) {
+								list_2004.add(title);
+							}
+							list_2004.add(resultRow);
+						} else if (year == 2005) {
+							if (list_2005.size() == 0) {
+								list_2005.add(title);
+							}
+							list_2005.add(resultRow);
+						} else if (year == 2006) {
+							if (list_2006.size() == 0) {
+								list_2006.add(title);
+							}
+							list_2006.add(resultRow);
+						} else if (year == 2008) {
+							if (list_2008.size() == 0) {
+								list_2008.add(title);
+							}
+							list_2008.add(resultRow);
+						} else if (year == 2009) {
+							if (list_2009.size() == 0) {
+								list_2009.add(title);
+							}
+							list_2009.add(resultRow);
+						}
+						break;
+					}
+				}
+				if (!isFind) {
+					notFindlist.add(row);
+				}
+			}
+			
+			OutputStream os;
+			os = new FileOutputStream(fileName);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			GuavaExcelUtil.writeDataToExcel(notFindlist, "未匹配到结果的数据", wb, os);
+			
+			for (int year = 1998; year <= 2009; year++) {
+				if (year == 2002 || year == 2007)
+					continue;
+				String sheetName = "匹配到结果的数据--" + year;
+				if (year == 1998) {
+					GuavaExcelUtil.writeDataToExcel(list_1998, sheetName, wb, os);
+				} else if (year == 1999) {
+					GuavaExcelUtil.writeDataToExcel(list_1999, sheetName, wb, os);
+				} else if (year == 2000) {
+					GuavaExcelUtil.writeDataToExcel(list_2000, sheetName, wb, os);
+				} else if (year == 2001) {
+					GuavaExcelUtil.writeDataToExcel(list_2001, sheetName, wb, os);
+				} else if (year == 2003) {
+					GuavaExcelUtil.writeDataToExcel(list_2003, sheetName, wb, os);
+				} else if (year == 2004) {
+					GuavaExcelUtil.writeDataToExcel(list_2004, sheetName, wb, os);
+				} else if (year == 2005) {
+					GuavaExcelUtil.writeDataToExcel(list_2005, sheetName, wb, os);
+				} else if (year == 2006) {
+					GuavaExcelUtil.writeDataToExcel(list_2006, sheetName, wb, os);
+				} else if (year == 2008) {
+					GuavaExcelUtil.writeDataToExcel(list_2008, sheetName, wb, os);
+				} else if (year == 2009) {
+					GuavaExcelUtil.writeDataToExcel(list_2009, sheetName, wb, os);
+				}
+			}
+			wb.write(os);
+			os.close();
+			latch.countDown();
+			return null;
+		}
+	}
+	
+	public static void step8(IEnterpriseDataService enterpriseDataService) throws Exception {
+		String fileNamePrefix = "E:\\lily_mcfly\\丽丽--企业财务数据\\网站数据\\数据不全企业";
+		List<List<List<String>>> lists = GuavaExcelUtil.loadExcelDataToList(fileNamePrefix + ".xlsx", 2);
+		ExecutorService executorService = Executors.newFixedThreadPool(2);
+		CountDownLatch latch = new CountDownLatch(2);
+		for(int i = 0 ;i < lists.size();i++){
+			String fileName = (i == 0 ? fileNamePrefix + "_分类不明确的.xlsx" : fileNamePrefix + "_分类明确的.xlsx");
+			executorService.submit(new Step8Callable(lists.get(i), fileName, enterpriseDataService, latch));
+		}
+		latch.await();
+	}
+	
+	private static String createQuerySQL(int year) {
+		String col = "";
+		if (year == 1998 || year == 1999) {
+			col = "企业名称";
+		} else if (year == 2000 || year == 2001 || year == 2002 || year == 2004
+				|| year == 2005 || year == 2006 || year == 2007 || year == 2008
+				|| year == 2009) {
+			col = "法人单位";
+		} else if (year == 2003) {
+			col = "单位名称";
+		}
+		String sql = "select * from t_enterprise_data_" + year + " where " + col + "  = :codition";
+
+		return sql;
+	}
+	
+	public static void step7() throws Exception {
+		String fileNamePrefix = "E:\\lily_mcfly\\丽丽--企业财务数据\\网站数据\\新增投资之一";
+		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(fileNamePrefix + ".xlsx");
+		List<List<List<String>>> results = new ArrayList<List<List<String>>>();
+		step5_1(list, results);
+		
+		OutputStream os;
+		String targetAbsoluteFilePath = fileNamePrefix + "_投资分类"+  ".xlsx";
+		os = new FileOutputStream(targetAbsoluteFilePath);
+		XSSFWorkbook wb = new XSSFWorkbook();
+		for (int i = 0; i < results.size(); i++) {
+			String sheetName = "";
+			if (i == 0) {
+				sheetName = "投资一次";
+			} else if (i == 1) {
+				sheetName = "投资多次";
+			}
+			GuavaExcelUtil.writeDataToExcel(results.get(i), sheetName, wb, os);
+		}
+		wb.write(os);
+		os.close();
+	}
+	
+	public static void step6() throws Exception {
 		String fileNamePrefix = "E:\\lily_mcfly\\丽丽--企业财务数据\\网站数据\\新增投资统计";
 		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(fileNamePrefix + ".xlsx");
 		List<List<List<String>>> results = new ArrayList<List<List<String>>>();

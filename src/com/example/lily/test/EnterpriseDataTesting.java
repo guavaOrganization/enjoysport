@@ -607,20 +607,20 @@ public class EnterpriseDataTesting {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void odan_20150510() {
-		for (int year = 2004; year < 2005; year++) {
+		for (int year = 2002; year < 2003; year++) {
 			String sourceTable = "odan_transformed_" + year;
-			for (int index = 1; index <= 12; index++) {
+			for (int index = 11; index <= 12; index++) {
 				String yearMonth = year + "" + (index < 10 ? "0" + index : index);
 				String destTable = "odan_customs_" + yearMonth;
 				try {
-					if (index <= 7)
-						continue;
 					for (int i = 33; i <= 40; i++) {
-						if (index == 8 && i <= 39)
+						if (index == 11 && i <= 35)
 							continue;
 						for (int j = 84; j <= 92; j++) {
+							if(index == 11 && i == 36 && j < 85)
+								continue;
 							enterpriseDataService.odan_20150510(true, sourceTable, destTable, yearMonth, false, i, j, 85);
 						}
 					}
@@ -629,6 +629,11 @@ public class EnterpriseDataTesting {
 				}
 			}
 		}
+	}
+	
+	@Test
+	public void step8() throws Exception {
+		GovernmentData.step8(enterpriseDataService);
 	}
 	
 	// @Test
