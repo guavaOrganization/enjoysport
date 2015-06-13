@@ -359,23 +359,27 @@ public class GovernmentData {
 
 	// TODO STEP 4
 	public static void step4() throws Exception {
-		String fileNamePrefix = "E:\\lily_mcfly\\丽丽--企业财务数据\\网站数据\\境外直接投资企业名录";
-		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(fileNamePrefix + "_去重_地区细化.xlsx");
+		String fileNamePrefix = "/Users/mcfly/lily_mcfly/每年投资数";
+		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(fileNamePrefix + ".xlsx");
 		List<List<String>> list1 = new ArrayList<List<String>>();
 		List<List<String>> list2 = new ArrayList<List<String>>();
 		List<List<String>> list3 = new ArrayList<List<String>>();
 		List<List<String>> list4 = new ArrayList<List<String>>();
 		List<List<String>> list5 = new ArrayList<List<String>>();
-		List<String> head = list.get(0);
-		list1.add(head);
-		list2.add(head);
-		list3.add(head);
-		list4.add(head);
-		list5.add(head);
+//		List<String> head = list.get(0);
+//		list1.add(head);
+//		list2.add(head);
+//		list3.add(head);
+//		list4.add(head);
+//		list5.add(head);
+		System.out.println("总共存在＝＝＝＝＝＝＝＝＝" + list.size() + "行数据。。。");
 		for (int i = 0; i < list.size(); i++) {
-			if (i == 0)
-				continue;
+//			if (i == 0)
+//				continue;
+			
 			List<String> row = list.get(i);
+			if(row.size() == 0)
+				continue;
 			String tempStr = row.get(7);
 			if (EAST_AREA.indexOf(tempStr) >= 0) {
 				list1.add(row);
@@ -390,6 +394,11 @@ public class GovernmentData {
 			}
 		}
 		
+		System.out
+				.println("结果行数＝＝＝＝＝＝"
+						+ (list1.size() + list2.size() + list3.size()
+								+ list4.size() + list5.size()));
+		
 		OutputStream os;
 		String targetAbsoluteFilePath = fileNamePrefix + "_再细化"+  ".xlsx";
 		os = new FileOutputStream(targetAbsoluteFilePath);
@@ -399,6 +408,25 @@ public class GovernmentData {
 		GuavaExcelUtil.writeDataToExcel(list3, "西部地区", wb, os);
 		GuavaExcelUtil.writeDataToExcel(list4, "中央企业,商务部", wb, os);
 		GuavaExcelUtil.writeDataToExcel(list5, "其他地区", wb, os);
+		wb.write(os);
+		os.close();
+	}
+	
+	public static void main(String[] args) {
+		try {
+//			createNewExcel();
+			step4();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void createNewExcel() throws Exception {
+		String fileNamePrefix = "/Users/mcfly/lily_mcfly/空文件.xlsx";
+		OutputStream os;
+		os = new FileOutputStream(fileNamePrefix);
+		XSSFWorkbook wb = new XSSFWorkbook();
+		GuavaExcelUtil.writeDataToExcel(new ArrayList<List<String>>(), "东部地区", wb, os);
 		wb.write(os);
 		os.close();
 	}
