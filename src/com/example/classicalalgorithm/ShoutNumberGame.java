@@ -20,7 +20,7 @@ public class ShoutNumberGame {
 	}
 	public static void shoutNumberGame(int total, int step) {
 		boolean[] isOuts = new boolean[total]; // 用于标记小伙伴是否出列
-		List<Integer> gamerNumberList = new ArrayList<>(10); // 结果列表
+		List<Integer> gamerNumberList = new ArrayList<Integer>(10); // 结果列表
 		int gameOverCondition = total; // 游戏参与人数
 		int count = 0;// 计数器
 		while (gameOverCondition > 0) {
