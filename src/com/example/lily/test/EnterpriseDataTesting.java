@@ -42,6 +42,29 @@ public class EnterpriseDataTesting {
 	@Qualifier("com.example.lily.service.impls.EnterpriseDataServiceImpl")
 	IEnterpriseDataService enterpriseDataService;
 
+	@Test
+	public void lily_20150529() {// 匹配工业企业数据库数据
+		try {
+			List<Integer> matchIndexs = new ArrayList<Integer>();
+			matchIndexs.add(12);
+			matchIndexs.add(13);
+			matchIndexs.add(14);
+			List<String> matchColumns = new ArrayList<String>();
+			matchColumns.add("法人代码");
+			matchColumns.add("企业名称");
+			matchColumns.add("法人代表姓名");
+			String year = "1998";
+			long now = System.currentTimeMillis();
+			enterpriseDataService.lily_20150529(
+					"/Users/mcfly/lily_mcfly/工业企业数据/对外直接投资2007年_" + year,
+					"/Users/mcfly/lily_mcfly/工业企业数据/对外直接投资2007年.xlsx", matchIndexs,
+					"t_enterprise_data_" + year, matchColumns, true, 6, 3);
+			System.out.println("共耗时～～～～" + (System.currentTimeMillis() - now));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	// @Test
 	public void testRepairListData() {
 		try {
@@ -70,24 +93,23 @@ public class EnterpriseDataTesting {
 	}
 	
 //	@Test
-	public void testQueryByLegalPersonCode() {// 根据
+	public void testQueryByLegalPersonCode() {
 		try {
 			long now = System.currentTimeMillis();
 			List<Integer> matchIndexs = new ArrayList<Integer>();
-			matchIndexs.add(10);
-			matchIndexs.add(11);
 			matchIndexs.add(12);
-			
+			matchIndexs.add(13);
+			matchIndexs.add(14);
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
 			matchColumns.add("企业名称");
 			matchColumns.add("法人代表姓名");
 			
-			String year = "1999";
+			String year = "1998";
 			enterpriseDataService.matchingEnterpriseDataAndreateResultFileToExcel(
-							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\" + year + "\\" + year + "_境外直接投资企业_补充_年企业财务数据整理结果" + ".xlsx",
-							"E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充.xlsx",
-							matchIndexs, "t_enterprise_data_" + year, matchColumns, true, 10);
+							"/Users/mcfly/lily_mcfly/对外直接投资2007年_" + year + ".xlsx",
+							"/Users/mcfly/lily_mcfly/对外直接投资2007年.xlsx",
+							matchIndexs, "t_enterprise_data_" + year, matchColumns, false, 10);
 			if(log.isInfoEnabled())
 				log.info("耗时............." + (System.currentTimeMillis() - now));
 		} catch (Exception e) {
@@ -631,7 +653,7 @@ public class EnterpriseDataTesting {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void step8() throws Exception {
 		GovernmentData.step8(enterpriseDataService);
 	}

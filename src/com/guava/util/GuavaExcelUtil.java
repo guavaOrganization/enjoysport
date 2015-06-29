@@ -10,7 +10,9 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -144,6 +146,73 @@ public class GuavaExcelUtil {
 					sheetAllDatas.add(rows);
 				}
 				excelAllDatas.add(sheetAllDatas);
+			}
+			if(log.isInfoEnabled())
+				log.info("耗时：" + (System.currentTimeMillis() - now));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (null != workbook) {
+				try {
+					workbook.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (null != is) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return excelAllDatas;
+	}
+	
+	public static Map<String,List<List<String>>> loadExcelDataToMap(String absolutePath, int sheetNum) {
+		InputStream is = null;
+		XSSFWorkbook workbook = null;
+		DecimalFormat df = new DecimalFormat("0"); 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		Map<String,List<List<String>>> excelAllDatas = new HashMap<String,List<List<String>>>();
+		try {
+			long now = System.currentTimeMillis();
+			is = new FileInputStream(new File(absolutePath));
+			workbook = new XSSFWorkbook(is);
+			for (int index = 0; index < sheetNum; index++) {
+				List<List<String>> sheetAllDatas = new ArrayList<List<String>>();
+				XSSFSheet sheet = workbook.getSheetAt(index);// 读取第一个sheet页数据
+				for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) { // 迭代行
+					XSSFRow xssfRow = sheet.getRow(i);
+					if(null == xssfRow){
+						System.out.println("第[" + (i + 1) + "]行为空");
+						break;
+					}
+					List<String> rows = new ArrayList<String>();
+					for (int j = xssfRow.getFirstCellNum(); j < xssfRow.getLastCellNum(); j++) {// 迭代列
+						XSSFCell xssfCell = xssfRow.getCell(j);
+						if (null == xssfCell) {
+							rows.add(StringUtils.EMPTY);
+							continue;
+						}
+						if (Cell.CELL_TYPE_NUMERIC == xssfCell.getCellType()) {// 数字 和 时间
+							if(HSSFDateUtil.isCellDateFormatted(xssfCell)) {// 时间
+								rows.add(sdf.format(xssfCell.getDateCellValue()));
+							}else{
+								rows.add(df.format(xssfCell.getNumericCellValue()));
+							}
+						} else if (Cell.CELL_TYPE_BOOLEAN == xssfCell.getCellType()) {// Blooean类型
+							rows.add(xssfCell.getBooleanCellValue() + "");
+						} else {
+							rows.add(xssfCell.toString());
+						}
+					}
+					sheetAllDatas.add(rows);
+				}
+				excelAllDatas.put(sheet.getSheetName(), sheetAllDatas);
 			}
 			if(log.isInfoEnabled())
 				log.info("耗时：" + (System.currentTimeMillis() - now));

@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
@@ -180,6 +182,87 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		return resultHolder;
 	}
 	
+	public void lily_20150529(String targetAbsoluteFilePath, String sourceAbsoluteFilePath, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns, boolean isConcurrent, int nThreads, int sheetNum) throws Exception {
+		Map<String,List<List<String>>> sheetMap = GuavaExcelUtil.loadExcelDataToMap(sourceAbsoluteFilePath, sheetNum);
+		Iterator<String> sheetNameIte = sheetMap.keySet().iterator();
+		
+		while (sheetNameIte.hasNext()) {
+			MatchingResultHolder matchingResultHolder = null;
+			String sheetName = sheetNameIte.next();
+			System.out.println("正在处理{" + sheetName + "}页的数据");
+			List<List<String>> list = sheetMap.get(sheetName);
+			if (null != list) {
+				if (isConcurrent) {// 并行匹配
+					if (nThreads <= 0 || nThreads > 10) { // 默认是个线程
+						nThreads = 10;
+					}
+					List<String> matchedHead = new ArrayList<String>();// 正确匹配结果的头部
+					List<List<String>> matchedResultList = new ArrayList<List<String>>();// 正确匹配的结果列表
+					List<String> unmatchHead = new ArrayList<String>();// 未正确匹配结果的头部
+					List<List<String>> unmatchResultList = new ArrayList<List<String>>();// 未正确匹配结果列表
+					
+					ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
+					CompletionService<MatchingResultHolder> completionService = new ExecutorCompletionService<MatchingResultHolder>(executorService);
+					int count = list.size();
+					List<Future<MatchingResultHolder>> resultHolders = new ArrayList<Future<MatchingResultHolder>>();
+					for (int index = 0; index < nThreads; index++) {
+						int start = index * (count / nThreads);// 开始下标
+						int end = 0;
+						if (index == nThreads - 1) {
+							end = (index + 1) * (count / nThreads) + count % nThreads;
+						} else {
+							end = (index + 1) * (count / nThreads);
+						}
+						if(log.isInfoEnabled()){
+							log.info("比对的开始下标为："+start + ", 结束下标下标为：" + end);
+						}
+						resultHolders.add(completionService.submit(new MatchingEnterpriseDataCallable(list, start, end, matchIndexs, sourceTableName, matchColumns, this)));
+					}
+					for (Future<MatchingResultHolder> future : resultHolders) {
+						MatchingResultHolder holder = future.get();
+						if(null == holder)
+							continue;
+						if (null != holder.getMatchedHead() && matchedHead.size() == 0) {
+							matchedHead.addAll(holder.getMatchedHead());
+						}
+						if (null != holder.getUnmatchHead() && unmatchHead.size() == 0) {
+							unmatchHead.addAll(holder.getUnmatchHead());
+						}
+						if (null != holder.getMatchedResultList() && holder.getMatchedResultList().size() > 0) {
+							matchedResultList.addAll(holder.getMatchedResultList());
+						}
+						if (null != holder.getUnmatchResultList() && holder.getUnmatchResultList().size() > 0) {
+							unmatchResultList.addAll(holder.getUnmatchResultList());
+						}
+					}
+					executorService.shutdownNow();
+					matchingResultHolder = new MatchingResultHolder(matchedHead, matchedResultList, unmatchHead, unmatchResultList);
+				} else {// 单线程匹配
+					matchingResultHolder = matchingEnterpriseData(list, 0, list.size(), matchIndexs, sourceTableName, matchColumns);
+				}
+				
+				List<List<String>> matchedResultList = matchingResultHolder.getMatchedResultList();
+				List<List<String>> unmatchResultList = matchingResultHolder.getUnmatchResultList();
+				if(null == matchedResultList || null == unmatchResultList)
+					return;
+				if (null != matchingResultHolder.getMatchedHead())
+					matchedResultList.add(0, matchingResultHolder.getMatchedHead());
+				if (null != matchingResultHolder.getUnmatchHead())
+					unmatchResultList.add(0, matchingResultHolder.getUnmatchHead());
+				OutputStream os = new FileOutputStream(targetAbsoluteFilePath + "_" + sheetName + ".xlsx");
+				XSSFWorkbook wb = new XSSFWorkbook();
+				GuavaExcelUtil.writeDataToExcel(matchedResultList, "匹配到结果的数据列表", wb, os);
+				if(matchedResultList != null)
+					matchedResultList = null;// Help GC
+				GuavaExcelUtil.writeDataToExcel(unmatchResultList, "未匹配到结果的数据列表", wb, os);
+				if(unmatchResultList != null)
+					unmatchResultList = null;// Help GC
+				wb.write(os);
+				os.close();
+			}
+		}
+	}
+	
 	public MatchingResultHolder matchingEnterpriseDataAndCreateResultToHolder(String sourceAbsoluteFilePath, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns, boolean isConcurrent, int nThreads) throws Exception {
 		MatchingResultHolder matchingResultHolder = null;
 		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(sourceAbsoluteFilePath);// 从Excel中加载数据
@@ -188,7 +271,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				log.info("sourceAbsoluteFilePath中没有数据,无需匹配");
 			return null;
 		}
-		boolean need = true;
+		boolean need = false;
 		if (need) {
 			// 需要翻译的列
 			List<Integer> needToBeTranslatedIndexs = new ArrayList<Integer>();
