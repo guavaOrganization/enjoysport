@@ -185,10 +185,11 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 	public void lily_20150529(String targetAbsoluteFilePath, String sourceAbsoluteFilePath, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns, boolean isConcurrent, int nThreads, int sheetNum) throws Exception {
 		Map<String,List<List<String>>> sheetMap = GuavaExcelUtil.loadExcelDataToMap(sourceAbsoluteFilePath, sheetNum);
 		Iterator<String> sheetNameIte = sheetMap.keySet().iterator();
-		
 		while (sheetNameIte.hasNext()) {
 			MatchingResultHolder matchingResultHolder = null;
 			String sheetName = sheetNameIte.next();
+			if ("t_enterprise_data_2001".equals(sourceTableName) && !"投资单个国家的".equals(sheetName))
+				continue;
 			System.out.println("正在处理{" + sheetName + "}页的数据");
 			List<List<String>> list = sheetMap.get(sheetName);
 			if (null != list) {

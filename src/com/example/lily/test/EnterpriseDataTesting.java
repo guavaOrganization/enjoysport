@@ -51,14 +51,14 @@ public class EnterpriseDataTesting {
 			matchIndexs.add(14);
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
-			matchColumns.add("企业名称");
-			matchColumns.add("法人代表姓名");
-			String year = "1998";
+			matchColumns.add("法人单位");
+			matchColumns.add("法人代表");
+			String year = "2001";
 			long now = System.currentTimeMillis();
 			enterpriseDataService.lily_20150529(
 					"/Users/mcfly/lily_mcfly/工业企业数据/对外直接投资2007年_" + year,
 					"/Users/mcfly/lily_mcfly/工业企业数据/对外直接投资2007年.xlsx", matchIndexs,
-					"t_enterprise_data_" + year, matchColumns, true, 6, 3);
+					"t_enterprise_data_" + year, matchColumns, true, 4, 3);
 			System.out.println("共耗时～～～～" + (System.currentTimeMillis() - now));
 		} catch (Exception e) {
 			e.printStackTrace();
