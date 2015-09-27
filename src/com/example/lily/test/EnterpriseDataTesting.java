@@ -1,5 +1,6 @@
 package com.example.lily.test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -41,8 +43,467 @@ public class EnterpriseDataTesting {
 	@Autowired
 	@Qualifier("com.example.lily.service.impls.EnterpriseDataServiceImpl")
 	IEnterpriseDataService enterpriseDataService;
-
+	
 	@Test
+	public void lily_20150925() {
+		String dirPath = "/Users/mcfly/lily_mcfly/";
+		String sourceDriName = "第四批次数据/";
+		String desDriName = "第五批次数据/";
+		
+		String[] prefixs = new String[] { "对外直接投资2002年", "对外直接投资2007年", "对外直接投资其他年份企业" };
+		String[] middles = new String[] { "单国N连投", "投资单个国家的", "投资多个国家的企业", "1998年", "2000年", "2001年" };
+		String[] years = new String[] { "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009" };
+		Map<String,String> dbIndexMapping =new HashMap<String, String>(); 
+		dbIndexMapping.put("1998", "行业类别");
+		dbIndexMapping.put("1999", "行业类别");
+		dbIndexMapping.put("2000", "行业类别");
+		dbIndexMapping.put("2001", "行业类别");
+		dbIndexMapping.put("2002", "行业类别");
+		dbIndexMapping.put("2003", "行业类别");
+		dbIndexMapping.put("2004", "行业代码");
+		dbIndexMapping.put("2005", "行业代码");
+		dbIndexMapping.put("2006", "行业代码");
+		dbIndexMapping.put("2007", "行业代码");
+		dbIndexMapping.put("2009", "行业代码");
+		
+		String surfix = ".xlsx";
+		for (int i = 0; i < prefixs.length; i++) {
+			int excelMatchIndex = 0;
+			if (i == 0) {
+				excelMatchIndex = 27;
+			} else if (i == 1) {
+				excelMatchIndex = 33;
+			}
+			for (int j = 0; j < middles.length; j++) {
+				if (i == 2 && j <= 2)
+					continue;
+				if (i == 2 && j == 3)
+					excelMatchIndex = 33;
+				if (i == 2 && j == 4)
+					excelMatchIndex = 31;
+				if (i == 2 && j == 5)
+					excelMatchIndex = 27;
+				for (int k = 0; k < years.length; k++) {
+					String sourceFileFullName = dirPath + sourceDriName + prefixs[i] + "_" + middles[j] + "_" + years[k] + surfix;
+					List<List<String>> excelDatas = null;
+					try {
+						excelDatas = GuavaExcelUtil.loadExcelDataToList(sourceFileFullName);
+					} catch (Exception e) {
+						// e.printStackTrace();
+						excelDatas = null;
+					}
+					if (null == excelDatas || excelDatas.size() == 0)
+						continue;
+					try {
+						if(null == dbIndexMapping.get(years[k]))
+							continue;
+						System.out.println("sourceFileFullName >>>>> " + sourceFileFullName);
+						System.out.println("years[k] >>>>>>>>>>>>" + years[k] + " >>>>>>>>>>>>>> value >>>>>>>>>>>>> " + dbIndexMapping.get(years[k]));
+						List<List<String>> resultList = enterpriseDataService.matchingEnterpriseData(excelDatas, excelMatchIndex, years[k], dbIndexMapping.get(years[k]));
+						if (null == resultList || resultList.size() == 0)
+							continue;
+						OutputStream os = null;
+						try {
+							String desFileFullName = dirPath + desDriName + prefixs[i] + "_" + middles[j] + "_" + years[k] + surfix;
+							os = new FileOutputStream(desFileFullName);
+							XSSFWorkbook wb = new XSSFWorkbook();
+							GuavaExcelUtil.writeDataToExcel(resultList, "结果数据", wb, os);
+							wb.write(os);
+							os.close();// 关闭输出流
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							if (os != null) {
+								try {
+									os.close();
+								} catch (IOException e) {
+									// e.printStackTrace();
+								}
+							}
+						}
+					} catch (Exception e) {
+						// e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
+	// @Test
+	public void lily_20150924() {
+		String dirPath = "/Users/mcfly/lily_mcfly/";
+		String surfix = ".xlsx";
+		String fileName = "对外直接投资其他年份企业";
+		String sourceFileFullName = dirPath + fileName + surfix;
+		String desDriName = "第四批次数据/";
+		int index = 9;
+		
+		Map<String,List<List<String>>> excelDatas = GuavaExcelUtil.loadExcelDataToMap(sourceFileFullName, 3);
+		Iterator<String> keyIte = excelDatas.keySet().iterator();
+		while (keyIte.hasNext()) {
+			String sheetName = keyIte.next();
+			List<List<String>> sheetData = excelDatas.get(sheetName);
+			Map<String, List<List<String>>> result = new HashMap<String, List<List<String>>>();
+			
+			if(null == sheetData || sheetData.size() == 1)
+				continue;
+			for (int i = 0; i < sheetData.size(); i++) {
+				if (i == 0)
+					continue;
+				List<String> row = sheetData.get(i);
+				if (null == row || row.size() < 10)
+					continue;
+				String approvalDate = row.get(index);
+				if (StringUtils.isBlank(approvalDate) || approvalDate.length() < 4)
+					continue;
+				String year = approvalDate.substring(0, 4);
+				List<List<String>> data = null;
+				if (!result.containsKey(year)) {
+					data = new ArrayList<List<String>>();
+					data.add(sheetData.get(0));
+				} else {
+					data = result.get(year);
+				}
+				data.add(row);
+				result.put(year, data);
+			}
+			
+			Iterator<String> resultKeyIte = result.keySet().iterator();
+			while (resultKeyIte.hasNext()) {
+				String year = resultKeyIte.next();
+				String desFileFullName = dirPath + desDriName + fileName + "_" + sheetName + "_" + year + surfix;
+				OutputStream os = null;
+				try {
+					os = new FileOutputStream(desFileFullName);
+					XSSFWorkbook wb = new XSSFWorkbook();
+					GuavaExcelUtil.writeDataToExcel(result.get(year), "结果数据",
+							wb, os);
+					wb.write(os);
+					os.close();// 关闭输出流
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (os != null) {
+						try {
+							os.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// @Test
+	public void lily_20150917() {
+		String dirPath = "/Users/mcfly/lily_mcfly/";
+		String sourceDirName = "第二批次数据/";
+		String desDriName = "第三批次数据/";
+		String[] sheetNames = new String[] { "1998年", "2000年", "2001年", "2002年", "2003年", "2004年", "2005年", "2007年", "2008年", "2009年" };
+		String[] years = new String[] { "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009" };
+		String prefix = "对外直接投资";
+		String surfix = ".xlsx";
+		for (int i = 0; i < sheetNames.length; i++) {
+			if(i < 7)
+				continue;
+			int splitIndex = getSplitIndex(i);
+			for (int j = 0; j < years.length - 1; j++) {
+				if (i == 7 && j <= 5)
+					continue;
+				String fileName1 = dirPath + sourceDirName + prefix + sheetNames[i] + "_" + years[j] + surfix;
+				String fileName2 = dirPath + sourceDirName + prefix + sheetNames[i] + "_" + years[j + 1] + surfix;
+				System.out.println("正在处理..........." + sheetNames[i] + "----" + years[j] + "----" + years[j + 1]);
+				boolean isFileNotFound = false;
+				List<List<String>> excelData1s = null;
+				try {
+					excelData1s = GuavaExcelUtil.loadExcelDataToList(fileName1);
+				} catch (Exception e) {
+					if (e instanceof FileNotFoundException)
+						isFileNotFound = true;
+				}
+				if (isFileNotFound || null == excelData1s || excelData1s.size() == 0)
+					continue;
+				
+				List<List<String>> excelData2s = null;
+				try {
+					excelData2s = GuavaExcelUtil.loadExcelDataToList(fileName2);
+				} catch (Exception e) {
+					if (e instanceof FileNotFoundException)
+						isFileNotFound = true;
+				}
+				if (isFileNotFound || null == excelData2s || excelData2s.size() == 0)
+					continue;
+				if (splitIndex <= 0)
+					continue;
+				String desFileFullName = dirPath + desDriName + prefix + sheetNames[i] + "_" + years[j] + "_" + years[j + 1];
+				List<List<String>> results = excelMatch(excelData1s, excelData2s, splitIndex, years[j], years[j + 1]);
+				excelData1s = null;
+				excelData2s = null;
+				if(null != results && results.size() > 0){
+					System.out.println(desFileFullName);
+					createFile(results, desFileFullName);
+				}
+			}
+		}
+	}
+	
+	private int getSplitIndex(int i) {
+		int splitIndex = 0;
+		switch (i) {
+			case 0:
+				splitIndex = 123;
+				break;
+			case 1:
+				splitIndex = 114;
+				break;
+			case 2:
+				splitIndex = 174;
+				break;
+			case 3:
+				splitIndex = 105;
+				break;
+			case 4:
+				splitIndex = 92;
+				break;
+			case 5:
+				splitIndex = 170;
+				break;
+			case 6:
+				splitIndex = 147;
+				break;
+			case 7:
+				splitIndex = 154;
+				break;
+			case 8:
+				splitIndex = 76;
+				break;
+			case 9:
+				splitIndex = 76;
+				break;
+			default:
+				break;
+		}
+		return splitIndex;
+	}
+
+	private void createFile(List<List<String>> results, String desFileFullName) {
+		if(null == results || results.size() == 0)
+			return;
+		int fileNumbers = 1;
+		if (results.size() > 10000 && results.size() <= 20000) {
+			fileNumbers = 2;
+		}
+		if (results.size() > 20000 && results.size() <= 30000) {
+			fileNumbers = 3;
+		}
+		if (results.size() > 30000 && results.size() <= 40000) {
+			fileNumbers = 4;
+		}
+		if (results.size() > 40000 && results.size() <= 50000) {
+			fileNumbers = 5;
+		} else if (results.size() > 50000) {
+			fileNumbers = 15;
+		}
+		for (int i = 0; i < fileNumbers; i++) {
+			OutputStream os = null;
+			int start = i * (results.size() / fileNumbers);// 开始下标
+			int end = 0;
+			if (i == fileNumbers - 1) {
+				end = (i + 1) * (results.size() / fileNumbers) + results.size() % fileNumbers;
+			} else {
+				end = (i + 1) * (results.size() / fileNumbers);
+			}
+			try {
+				os = new FileOutputStream(desFileFullName + "_" + i + ".xlsx");
+				XSSFWorkbook wb = new XSSFWorkbook();
+				GuavaExcelUtil.writeDataToExcel(results, "匹配到结果的数据列表", wb, os, start, end);
+				wb.write(os);
+				os.close();// 关闭输出流
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if(os != null){
+					try {
+						os.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+	}
+	
+	private List<List<String>> excelMatch(List<List<String>> excelData1s, List<List<String>> excelData2s, int splitIndex, String year1,String year2) {
+		List<List<String>> results = new ArrayList<List<String>>();
+		List<String> head = new ArrayList<String>();
+
+		List<String> head1 = excelData1s.get(0);
+		List<String> head2 = excelData2s.get(0);
+		if (head1 == null || head1.size() == 0 || head2 == null || head2.size() == 0)
+			return null;
+		List<String> subList = head2.subList(splitIndex, head2.size());
+		
+		String tip = "------------左边是：" + year1 + "年的数据，右边是：" + year2 + "年的数据------------";
+		
+		head.addAll(head1);
+		head.add(tip);
+		head.addAll(subList);
+		
+		results.add(head);
+		int[] macthIndexs1 = getMatchIndexs(year1);
+		int[] macthIndexs2 = getMatchIndexs(year2);
+		for (int i = 0; i < excelData1s.size(); i++) {
+			if(i == 0)
+				continue;
+			List<String> row1 = excelData1s.get(i);
+			if(null == row1 || row1.size() == 0)
+				continue;
+			List<String> subList1 = null;
+			try {
+				subList1 = row1.subList(splitIndex, row1.size());
+			} catch (Exception e) {
+				System.out.println("第一个表格，出现问题的行数--" + (i + 1));
+			}
+			if(null == subList1)
+				continue;
+			for (int j = 0; j < excelData2s.size(); j++) {
+				if (j == 0)
+					continue;
+				List<String> row2 = excelData2s.get(j);	
+				if(null == row2 || row2.size() == 0)
+					continue;
+				List<String> subList2 = null;
+				try {
+					subList2 = row2.subList(splitIndex, row2.size());
+				} catch (Exception e) {
+					System.out.println("出现异常的行为：" + (j + 1));
+				}
+				if(null == subList2)
+					continue;
+				
+				if (isMatch(subList1, subList2, macthIndexs1, macthIndexs2)) {
+					List<String> result = new ArrayList<String>();
+					result.addAll(row1);
+					result.add(tip);
+					result.addAll(subList2);
+					results.add(result);
+				}
+			}
+		}
+		return results;
+	}
+	
+	private boolean isMatch(List<String> subList1, List<String> subList2, int[] macthIndexs1, int[] macthIndexs2) {
+		for (int i = 0; i < 3; i++) {
+			if (macthIndexs1[i] < 0 || macthIndexs2[i] < 0) {
+				continue;
+			}
+			String col1 = subList1.get(macthIndexs1[i]);
+			String col2 = subList2.get(macthIndexs2[i]);
+			if (StringUtils.isBlank(col1) || StringUtils.isBlank(col2))
+				continue;
+			if (col1.trim().equals(col2.trim()))
+				return true;
+		}
+		return false;
+	}
+	
+	// 年份     法人代码		法人代表名称			企业名称
+	// 1998       0				5					3
+	// 1999		  0				3					1
+	// 2000		  0				2					1
+	// 2001		  0				2					1
+	// 2002		  0				2					1
+	// 2003		  0				2					1
+	// 2004		  0				2					1
+	// 2005		  0				2					1
+	// 2006		  0				2					1
+	// 2007		  0				2					1
+	// 2008		 -1				-1					0
+	// 2009		  0				-1					1
+	private int[] getMatchIndexs(String year) {
+		if ("1998".equals(year)) {
+			return new int[] { 0, 5, 3 };
+		} else if ("1999".equals(year)) {
+			return new int[] { 0, 3, 1 };
+		} else if ("2008".equals(year)) {
+			return new int[] { -1, -1, 0 };
+		} else if ("2009".equals(year)) {
+			return new int[] { 0, -1, 1 };
+		} else {
+			return new int[] { 0, 2, 1 };
+		}
+	}
+	
+	
+	// 对外直接投资其他年份企业_1998_1998年.xlsx
+	// 将上面的文件重命名
+	// @Test
+	public void lily_20150916_1() {
+		String dirPath = "/Users/mcfly/lily_mcfly/";
+		String sourceDirName = "第一批次数据/";
+		String disDirName = "第二批次数据/";
+		String[] sheetNames = new String[] { "1998年", "2000年", "2001年", "2003年", "2004年", "2005年", "2008年", "2009年" };
+		String[] years = new String[] { "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009" };
+		String suffix = ".xlsx";
+		for (int i = 0; i < sheetNames.length; i++) {
+			for (int j = 0; j < years.length; j++) {
+				String fileName = dirPath + sourceDirName + "对外直接投资其他年份企业" + "_" + years[j] + "_" + sheetNames[i] + suffix;
+				File file = new File(fileName);
+				file.renameTo(new File (dirPath + disDirName + "对外直接投资" + sheetNames[i] + "_" + years[j] + suffix));
+			}
+		}
+	}
+	
+	// @Test
+	// 对外直接投资2002年_1998_单国N连投.xlsx
+	// 对外直接投资2002年_1998_投资单个国家的.xlsx
+	// 对外直接投资2002年_1998_投资多个国家的企业.xlsx
+	// 将这三个文件中的“匹配到结果的数据列表”的sheet页合并
+	public void lily_20150916() throws Exception {
+		try {
+			String[] strings = new String[]{"对外直接投资2007年"};
+			String[] years = new String[] { "2008", "2009" };
+			String[] sheetNames = new String[] { "单国N连投", "投资单个国家的", "投资多个国家的" };
+			String dirPath = "/Users/mcfly/lily_mcfly/";
+			String sourceDirName = "第一批次数据/";
+			String disDirName = "第二批次数据/";
+			String suffix = ".xlsx";
+			for (int i = 0; i < strings.length; i++) {
+				for (int j = 0; j < years.length; j++) {
+					List<List<String>> rows = new ArrayList<List<String>>();
+					for (int k = 0; k < sheetNames.length; k++) {
+						String fileFullName = dirPath + sourceDirName + strings[i] + "_" + years[j] + "_" + sheetNames[k] + suffix;
+						List<List<String>> excelDatas = GuavaExcelUtil.loadExcelDataToList(fileFullName);
+						if (null == excelDatas || excelDatas.size() < 1) {
+							continue;
+						}
+						if (k != 0) {
+							excelDatas.remove(0);// 把标题一处
+						}
+						if (excelDatas.size() == 0)
+							continue;
+						rows.addAll(excelDatas);
+					}
+					if (rows.size() == 0)
+						continue;
+					String desFileFullName = dirPath + disDirName + strings[i] + "_" + years[j] + suffix;
+					OutputStream os = new FileOutputStream(desFileFullName);
+					XSSFWorkbook wb = new XSSFWorkbook();
+					GuavaExcelUtil.writeDataToExcel(rows, "匹配到结果的数据列表", wb, os);
+					wb.write(os);
+					os.close();// 关闭输出流
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+
+//	@Test
 	public void lily_20150529() {// 匹配工业企业数据库数据
 		try {
 			List<Integer> matchIndexs = new ArrayList<Integer>();
@@ -275,20 +736,23 @@ public class EnterpriseDataTesting {
 		os.close();
 	}
 	
-	// @Test
+//	@Test
 	public void lily20150422_2() { // 根据《境外直接投资企业》或《境外直接投资企业_补充》得出《****多国投资数据比对》数据,后置方法是lily20150422_3
 		try {
 			Set<String> set = new HashSet<String>();
-			List<List<String>> list = GuavaExcelUtil.loadExcelDataToList("E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充.xlsx");
+			String execlFullFileName = "/Users/mcfly/lily_mcfly/地区分类_东部地区";
+			List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(execlFullFileName + ".xlsx");
+
 			List<List<String>> no = new ArrayList<List<String>>();
 			no.add(list.get(0));
+
 			List<List<String>> yes = new ArrayList<List<String>>();
-			
+
 			for (int i = 0; i < list.size(); i++) {
 				if (i == 0)
 					continue;
 				List<String> row = list.get(i);
-				String key = row.get(9);
+				String key = row.get(5);
 				key = null == key || "".equals(key.trim()) ? "" : key.trim();
 				if ("".equals(key)) {
 					no.add(row);
@@ -303,7 +767,7 @@ public class EnterpriseDataTesting {
 					if (j == 0 || i == j) // 第一行和本身不进行比较
 						continue;
 					List<String> tempRow = list.get(j);
-					String tempKey = tempRow.get(9);
+					String tempKey = tempRow.get(5);
 					tempKey = null == tempKey || "".equals(tempKey.trim()) ? "" : tempKey.trim();
 					if ("".equals(tempKey))
 						continue;
@@ -322,37 +786,20 @@ public class EnterpriseDataTesting {
 			Collections.sort(yes, new Comparator<List<String>>() {
 				@Override
 				public int compare(List<String> paramT1, List<String> paramT2) {
-					String key1 = paramT1.get(9);
+					String key1 = paramT1.get(5);
 					key1 = null == key1 || "".equals(key1.trim()) ? "" : key1.trim();
-					String key2 = paramT2.get(9);
+					String key2 = paramT2.get(5);
 					key2 = null == key2 || "".equals(key2.trim()) ? "" : key2.trim();
-					int int1 = 0;
-					int int2 = 0;
-					try {
-						if (key1.endsWith("X") || key1.endsWith("x"))
-							int1 = Integer.parseInt(key1.substring(0, key1.length() - 1));
-						else if (key1.startsWith("X") || key1.startsWith("x"))
-							int1 = Integer.parseInt(key1.substring(1, key1.length()));
-						else
-							int1 = Integer.parseInt(key1);
-					} catch (Exception e) {
-						int1 = 0;
+					if (key1.equals(key2)) {
+						return 0;
+					} else {
+						return -1;
 					}
-					try {
-						if (key2.endsWith("X") || key2.endsWith("x"))
-							int2 = Integer.parseInt(key2.substring(0, key2.length() - 1));
-						else if (key2.startsWith("X") || key2.startsWith("x"))
-							int2 = Integer.parseInt(key2.substring(1, key2.length()));
-						else
-							int2 = Integer.parseInt(key2);
-					} catch (Exception e) {
-						int2 = 0;
-					}
-					return int1 - int2;
 				}
 			});
+			
 			yes.add(0, list.get(0));
-			String targetAbsoluteFilePath = "E:\\lily_mcfly\\丽丽--企业财务数据\\企业财务数据整理\\境外直接投资企业_补充_多国投资数据比对.xlsx";
+			String targetAbsoluteFilePath = execlFullFileName + "_单国_多国.xlsx";
 			OutputStream os = new FileOutputStream(targetAbsoluteFilePath);
 			XSSFWorkbook wb = new XSSFWorkbook();
 			GuavaExcelUtil.writeDataToExcel(yes, "多国投资", wb, os);

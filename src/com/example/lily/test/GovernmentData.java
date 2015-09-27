@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -415,7 +417,8 @@ public class GovernmentData {
 	public static void main(String[] args) {
 		try {
 //			createNewExcel();
-			step4();
+//			step4();
+			distinguishArea();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -433,38 +436,43 @@ public class GovernmentData {
 	
 	// TODO step3
 	public static void distinguishArea() throws IOException {
-		String fileNamePrefix = "E:\\lily_mcfly\\丽丽--企业财务数据\\网站数据\\境外直接投资企业名录_去重";
-		List<List<String>> list = GuavaExcelUtil.loadExcelDataToList(fileNamePrefix + ".xlsx");
-		for (int i = 0; i < list.size(); i++) {
-			List<String> row = list.get(i);
-			if (i == 0) {
-				row.add(3, "是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
-				row.add(4, "是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
-				continue;
+		String fileNamePrefix = "/Users/mcfly/lily_mcfly/地区分类";
+		Map<String,List<List<String>>> map = GuavaExcelUtil.loadExcelDataToMap(fileNamePrefix + ".xlsx", 2);
+		Iterator<String> ite = map.keySet().iterator();
+		while(ite.hasNext()){
+			String sheetName = ite.next();
+			List<List<String>> list = map.get(sheetName);
+			for (int i = 0; i < list.size(); i++) {
+				List<String> row = list.get(i);
+				if (i == 0) {
+					row.add(3, "是否为亚洲国家（地区）(1:亚洲国家,0:非亚洲国家)");
+					row.add(4, "是否为高收入国家(1:高收入国家;0:非高收入其他国家)");
+					continue;
+				}
+				
+				String isAsiaCountry = "0";
+				if (EnterpriseDataServiceImpl.ASIA_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为亚洲国家
+					isAsiaCountry = "1";
+				} else {
+					isAsiaCountry = "0";
+				}
+				String isDeveloped = "0";
+				if (EnterpriseDataServiceImpl.DEVELOPED_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为高收入国家
+					isDeveloped = "1";
+				} else {
+					isDeveloped = "0";
+				}
+				row.add(3, isAsiaCountry);
+				row.add(4, isDeveloped);
 			}
-			
-			String isAsiaCountry = "0";
-			if (EnterpriseDataServiceImpl.ASIA_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为亚洲国家
-				isAsiaCountry = "1";
-			} else {
-				isAsiaCountry = "0";
-			}
-			String isDeveloped = "0";
-			if (EnterpriseDataServiceImpl.DEVELOPED_COUNTRY.indexOf(row.get(2)) >= 0) { // 是否为高收入国家
-				isDeveloped = "1";
-			} else {
-				isDeveloped = "0";
-			}
-			row.add(3, isAsiaCountry);
-			row.add(4, isDeveloped);
+			OutputStream os;
+			String targetAbsoluteFilePath = fileNamePrefix + "_" + sheetName +  ".xlsx";
+			os = new FileOutputStream(targetAbsoluteFilePath);
+			XSSFWorkbook wb = new XSSFWorkbook();
+			GuavaExcelUtil.writeDataToExcel(list, sheetName, wb, os);
+			wb.write(os);
+			os.close();
 		}
-		OutputStream os;
-		String targetAbsoluteFilePath = fileNamePrefix + "_地区细化"+  ".xlsx";
-		os = new FileOutputStream(targetAbsoluteFilePath);
-		XSSFWorkbook wb = new XSSFWorkbook();
-		GuavaExcelUtil.writeDataToExcel(list, "境外直接投资企业名录", wb, os);
-		wb.write(os);
-		os.close();
 	}
 	
 	// TODO step2

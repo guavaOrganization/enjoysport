@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
@@ -113,6 +114,46 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 			log.error("在MDB中匹配到数据，结束修复工作..........");
 		}
 		return repairedDataList;
+	}
+	
+	public List<List<String>> matchingEnterpriseData(List<List<String>> excelDatas, int excelMatchIndex, String year, String dbMatchColName) throws Exception {
+		if(excelDatas == null || excelDatas.size() <= 1)
+			return null;
+		String tableName = "t_enterprise_data_" + year;
+		String splitTipe = "-----------------左边是Excel数据，右边是MDB数据-----------------";
+		List<String> resultMetaDatas = null;
+		List<List<String>> resultList = new ArrayList<List<String>>();
+		Random random = new Random();
+		for (int i = 1; i < excelDatas.size(); i++) {
+			String excelMatchValue = excelDatas.get(i).get(excelMatchIndex);
+			if(StringUtils.isBlank(excelMatchValue))
+				continue;
+			QueryDBResultHolder dbResultHolder = enterpriseDataDAO.queryEnterpriseData(tableName, dbMatchColName, excelMatchValue);
+			if (null == dbResultHolder || dbResultHolder.getResultDatas() == null || dbResultHolder.getResultDatas().size() == 0) {
+				if (excelMatchValue.length() >= 3) {
+					dbResultHolder = enterpriseDataDAO.queryLikeEnterpriseData(tableName, dbMatchColName, excelMatchValue.substring(0, 3) + "%");
+				}
+			}
+			if (null != dbResultHolder && dbResultHolder.getResultDatas() != null && dbResultHolder.getResultDatas().size() > 0) {
+				if(null == resultMetaDatas)
+					resultMetaDatas = dbResultHolder.getResultMetaDatas();
+				List<List<String>> resultDatas = dbResultHolder.getResultDatas();
+				int randomIndex = random.nextInt(resultDatas.size());
+				if (randomIndex >= resultDatas.size())
+					randomIndex = resultDatas.size() - 1;
+				List<String> resultRow = new ArrayList<String>();
+				resultRow.addAll(excelDatas.get(i));
+				resultRow.add(splitTipe);
+				resultRow.addAll(resultDatas.get(randomIndex));
+				resultList.add(resultRow);
+			}
+		}
+		List<String> head = new ArrayList<String>();
+		head.addAll(excelDatas.get(0));
+		head.add(splitTipe);
+		head.addAll(resultMetaDatas);
+		resultList.add(0, head);
+		return resultList;
 	}
 	
 	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns) throws Exception {

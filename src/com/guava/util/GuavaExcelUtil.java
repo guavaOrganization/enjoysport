@@ -61,8 +61,28 @@ public class GuavaExcelUtil {
 		if (null == os) {
 			throw new IllegalArgumentException("OutputStream不允许为空");
 		}
+		System.out.println(dataList.size());
 		XSSFSheet sheet = wb.createSheet(sheetName); // 创建Sheet页
 		for (int i = 0; i < dataList.size(); i++) {
+			List<String> datas = dataList.get(i);
+			XSSFRow row = sheet.createRow(i);
+			for (int j = 0; j < datas.size(); j++) {
+				row.createCell(j).setCellValue(datas.get(j));
+			}
+		}
+	}
+	
+	public static void writeDataToExcel(List<List<String>> dataList, String sheetName, XSSFWorkbook wb, OutputStream os, int start, int end) throws IOException {
+		if (null == wb) {
+			throw new IllegalArgumentException("XSSFWorkbook不允许为空");
+		}
+		if (null == os) {
+			throw new IllegalArgumentException("OutputStream不允许为空");
+		}
+		System.out.println(dataList.size());
+		XSSFSheet sheet = wb.createSheet(sheetName); // 创建Sheet页
+		for (int i = start; i < end; i++) {
+			System.out.println("还有 --" + (end - start - i - 1) + "-- 行数据没有处理");
 			List<String> datas = dataList.get(i);
 			XSSFRow row = sheet.createRow(i);
 			for (int j = 0; j < datas.size(); j++) {
