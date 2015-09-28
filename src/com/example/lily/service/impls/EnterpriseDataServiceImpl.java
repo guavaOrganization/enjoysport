@@ -299,7 +299,7 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				GuavaExcelUtil.writeDataToExcel(unmatchResultList, "未匹配到结果的数据列表", wb, os);
 				if(unmatchResultList != null)
 					unmatchResultList = null;// Help GC
-				wb.write(os);
+				wb.write(os); 
 				os.close();
 			}
 		}
