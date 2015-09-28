@@ -44,7 +44,7 @@ public class EnterpriseDataTesting {
 	@Qualifier("com.example.lily.service.impls.EnterpriseDataServiceImpl")
 	IEnterpriseDataService enterpriseDataService;
 	
-	@Test
+	// @Test
 	public void lily_20150925() {
 		String dirPath = "/Users/mcfly/lily_mcfly/";
 		String sourceDriName = "第四批次数据/";
@@ -481,7 +481,7 @@ public class EnterpriseDataTesting {
 							continue;
 						}
 						if (k != 0) {
-							excelDatas.remove(0);// 把标题一处
+							excelDatas.remove(0);// 把标题移除
 						}
 						if (excelDatas.size() == 0)
 							continue;
@@ -503,22 +503,22 @@ public class EnterpriseDataTesting {
 	}
 	
 
-//	@Test
+	@Test
 	public void lily_20150529() {// 匹配工业企业数据库数据
 		try {
 			List<Integer> matchIndexs = new ArrayList<Integer>();
+			matchIndexs.add(11);
 			matchIndexs.add(12);
 			matchIndexs.add(13);
-			matchIndexs.add(14);
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
 			matchColumns.add("法人单位");
 			matchColumns.add("法人代表");
-			String year = "2001";
+			String year = "2007";
 			long now = System.currentTimeMillis();
 			enterpriseDataService.lily_20150529(
-					"/Users/mcfly/lily_mcfly/工业企业数据/对外直接投资2007年_" + year,
-					"/Users/mcfly/lily_mcfly/工业企业数据/对外直接投资2007年.xlsx", matchIndexs,
+					"/Users/mcfly/lily_mcfly/第一批次数据/对外直接投资2007年_" + year,
+					"/Users/mcfly/lily_mcfly/对外直接投资2007年.xlsx", matchIndexs,
 					"t_enterprise_data_" + year, matchColumns, true, 4, 3);
 			System.out.println("共耗时～～～～" + (System.currentTimeMillis() - now));
 		} catch (Exception e) {
