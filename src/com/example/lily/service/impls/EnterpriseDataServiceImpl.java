@@ -116,14 +116,13 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		return repairedDataList;
 	}
 	
-	public List<List<String>> matchingEnterpriseData(List<List<String>> excelDatas, int excelMatchIndex, String year, String dbMatchColName) throws Exception {
+	public List<List<String>> matchingEnterpriseData(List<List<String>> excelDatas, int excelMatchIndex, String year, String dbMatchColName, List<String[]> ignoreDatas) throws Exception {
 		if(excelDatas == null || excelDatas.size() <= 1)
 			return null;
 		String tableName = "t_enterprise_data_" + year;
-		String splitTipe = "-----------------左边是Excel数据，右边是MDB数据-----------------";
+		String splitTipe = "-----------------左边是Excel数据，右边是MDB数据（非对外投资数据）-----------------";
 		List<String> resultMetaDatas = null;
 		List<List<String>> resultList = new ArrayList<List<String>>();
-		Random random = new Random();
 		for (int i = 1; i < excelDatas.size(); i++) {
 			String excelMatchValue = excelDatas.get(i).get(excelMatchIndex);
 			if(StringUtils.isBlank(excelMatchValue))
@@ -138,16 +137,18 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 				if(null == resultMetaDatas)
 					resultMetaDatas = dbResultHolder.getResultMetaDatas();
 				List<List<String>> resultDatas = dbResultHolder.getResultDatas();
-				int randomIndex = random.nextInt(resultDatas.size());
-				if (randomIndex >= resultDatas.size())
-					randomIndex = resultDatas.size() - 1;
+				List<String> turthData = getTurthData(ignoreDatas, resultDatas, year);
+				if(turthData == null)
+					continue;
 				List<String> resultRow = new ArrayList<String>();
 				resultRow.addAll(excelDatas.get(i));
 				resultRow.add(splitTipe);
-				resultRow.addAll(resultDatas.get(randomIndex));
+				resultRow.addAll(turthData);
 				resultList.add(resultRow);
 			}
 		}
+		if (resultMetaDatas == null)
+			return null;
 		List<String> head = new ArrayList<String>();
 		head.addAll(excelDatas.get(0));
 		head.add(splitTipe);
@@ -155,6 +156,57 @@ public class EnterpriseDataServiceImpl implements IEnterpriseDataService {
 		resultList.add(0, head);
 		return resultList;
 	}
+	
+	private List<String> getTurthData(List<String[]> ignoreDatas, List<List<String>> resultDatas, String year) {
+		int index1 = -1;
+		int index2 = -1;
+		int index3 = -1;
+		if ("1998".equals(year)) {
+			index1 = 0;
+			index2 = 3;
+			index3 = 5;
+		} else if ("1999".equals(year)) {
+			index1 = 0;
+			index2 = 1;
+			index3 = 3;
+		} else if ("2000".equals(year) || "2001".equals(year) || "2002".equals(year) || "2003".equals(year) || "2004".equals(year)
+				|| "2005".equals(year) || "2006".equals(year) || "2007".equals(year)) {
+			index1 = 0;
+			index2 = 1;
+			index3 = 2;
+		} else if ("2008".equals(year)) {
+			index1 = 0;
+			index2 = -1;
+			index3 = -1;
+		} else if ("2009".equals(year)) {
+			index1 = 0;
+			index2 = -1;
+			index3 = -1;
+		}
+		for (int i = 0; i < resultDatas.size(); i++) {
+			List<String> row = resultDatas.get(i);
+			boolean isTruthData = false;
+			for (int j = 0; j < ignoreDatas.size(); j++) {// 匹配的结果数据
+				String[] ignoreData = ignoreDatas.get(j);
+				if (index1 >= 0 && row.get(index1).equals(ignoreData[0])) {// 根据法人代码表示是对外投资企业数据
+					continue;
+				}
+				if (index2 >= 0 && row.get(index2).equals(ignoreData[1])) {// 根据企业单位表示是对外投资企业数据
+					continue;
+				}
+				if (index3 >= 0 && row.get(index3).equals(ignoreData[2])) {// 根据法人代表表示是对外投资企业数据
+					continue;
+				}
+				isTruthData = true;
+				break;
+			}
+			if(isTruthData)
+				return row;
+		}
+		return null;
+	}
+	
+
 	
 	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns) throws Exception {
 		if(null == matchIndexs || matchIndexs.size() == 0){

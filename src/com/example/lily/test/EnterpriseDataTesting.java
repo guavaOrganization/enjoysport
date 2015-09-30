@@ -44,12 +44,56 @@ public class EnterpriseDataTesting {
 	@Qualifier("com.example.lily.service.impls.EnterpriseDataServiceImpl")
 	IEnterpriseDataService enterpriseDataService;
 	
-	// @Test
+	public List<String[]> loadData() {
+		String dirPath = "/Users/mcfly/lily_mcfly/";
+		String[] prefixs = new String[] { "对外直接投资2002年", "对外直接投资2007年", "对外直接投资其他年份企业" };
+		String surfix = ".xlsx";
+		List<String[]> datas = new ArrayList<String[]>();
+		for(int i = 0 ; i < prefixs.length;i++){
+			int sheetNum = 3;
+			if (i == 2)
+				sheetNum = 8;
+			Map<String,List<List<String>>> map = GuavaExcelUtil.loadExcelDataToMap(dirPath + prefixs[i] + surfix, sheetNum);
+			Iterator<String> ite = map.keySet().iterator();
+			while (ite.hasNext()) {
+				String sheetName = ite.next();
+				List<List<String>> sheetDatas = map.get(sheetName);
+				if (null == sheetDatas || sheetDatas.size() == 0)
+					continue;
+				for (int k = 0; k < sheetDatas.size(); k++) {
+					if (k == 0)
+						continue;
+					List<String> row = sheetDatas.get(k);
+					String[] data = new String[3];
+					if ("1998年".equals(sheetName)) {
+						data[0] = row.get(11).trim();// 法人代码
+						data[1] = row.get(14).trim();// 企业名称
+						data[2] = row.get(16).trim();// 法人代表姓名
+					} else if ("2008年".equals(sheetName)) {
+						data[0] = row.get(11).trim();// 法人代码
+						data[1] = "";
+						data[2] = "";
+					} else if ("2009年".equals(sheetName)) {
+						data[0] = row.get(11).trim();// 法人代码
+						data[1] = row.get(12).trim();// 企业名称
+						data[2] = "";
+					} else {
+						data[0] = row.get(11).trim();// 法人代码
+						data[1] = row.get(12).trim();// 企业名称
+						data[2] = row.get(13).trim();// 法人代表姓名
+					}
+					datas.add(data);
+				}
+			}
+		}
+		return datas;
+	}
+	
+	@Test
 	public void lily_20150925() {
 		String dirPath = "/Users/mcfly/lily_mcfly/";
 		String sourceDriName = "第四批次数据/";
 		String desDriName = "第五批次数据/";
-		
 		String[] prefixs = new String[] { "对外直接投资2002年", "对外直接投资2007年", "对外直接投资其他年份企业" };
 		String[] middles = new String[] { "单国N连投", "投资单个国家的", "投资多个国家的企业", "1998年", "2000年", "2001年" };
 		String[] years = new String[] { "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009" };
@@ -64,7 +108,9 @@ public class EnterpriseDataTesting {
 		dbIndexMapping.put("2005", "行业代码");
 		dbIndexMapping.put("2006", "行业代码");
 		dbIndexMapping.put("2007", "行业代码");
+		dbIndexMapping.put("2008", "行业代码");
 		dbIndexMapping.put("2009", "行业代码");
+		List<String[]> ignoreDatas = loadData();
 		
 		String surfix = ".xlsx";
 		for (int i = 0; i < prefixs.length; i++) {
@@ -99,7 +145,7 @@ public class EnterpriseDataTesting {
 							continue;
 						System.out.println("sourceFileFullName >>>>> " + sourceFileFullName);
 						System.out.println("years[k] >>>>>>>>>>>>" + years[k] + " >>>>>>>>>>>>>> value >>>>>>>>>>>>> " + dbIndexMapping.get(years[k]));
-						List<List<String>> resultList = enterpriseDataService.matchingEnterpriseData(excelDatas, excelMatchIndex, years[k], dbIndexMapping.get(years[k]));
+						List<List<String>> resultList = enterpriseDataService.matchingEnterpriseData(excelDatas, excelMatchIndex, years[k], dbIndexMapping.get(years[k]), ignoreDatas);
 						if (null == resultList || resultList.size() == 0)
 							continue;
 						OutputStream os = null;
@@ -205,12 +251,8 @@ public class EnterpriseDataTesting {
 		String prefix = "对外直接投资";
 		String surfix = ".xlsx";
 		for (int i = 0; i < sheetNames.length; i++) {
-			if(i < 7)
-				continue;
 			int splitIndex = getSplitIndex(i);
 			for (int j = 0; j < years.length - 1; j++) {
-				if (i == 7 && j <= 5)
-					continue;
 				String fileName1 = dirPath + sourceDirName + prefix + sheetNames[i] + "_" + years[j] + surfix;
 				String fileName2 = dirPath + sourceDirName + prefix + sheetNames[i] + "_" + years[j + 1] + surfix;
 				System.out.println("正在处理..........." + sheetNames[i] + "----" + years[j] + "----" + years[j + 1]);
@@ -315,7 +357,10 @@ public class EnterpriseDataTesting {
 				end = (i + 1) * (results.size() / fileNumbers);
 			}
 			try {
-				os = new FileOutputStream(desFileFullName + "_" + i + ".xlsx");
+				if (fileNumbers == 1)
+					os = new FileOutputStream(desFileFullName + ".xlsx");
+				else
+					os = new FileOutputStream(desFileFullName + "_" + i + ".xlsx");
 				XSSFWorkbook wb = new XSSFWorkbook();
 				GuavaExcelUtil.writeDataToExcel(results, "匹配到结果的数据列表", wb, os, start, end);
 				wb.write(os);
@@ -457,7 +502,7 @@ public class EnterpriseDataTesting {
 		}
 	}
 	
-	// @Test
+	//@Test
 	// 对外直接投资2002年_1998_单国N连投.xlsx
 	// 对外直接投资2002年_1998_投资单个国家的.xlsx
 	// 对外直接投资2002年_1998_投资多个国家的企业.xlsx
@@ -465,10 +510,10 @@ public class EnterpriseDataTesting {
 	public void lily_20150916() throws Exception {
 		try {
 			String[] strings = new String[]{"对外直接投资2007年"};
-			String[] years = new String[] { "2008", "2009" };
+			String[] years = new String[] { "2007" };
 			String[] sheetNames = new String[] { "单国N连投", "投资单个国家的", "投资多个国家的" };
-			String dirPath = "/Users/mcfly/lily_mcfly/";
-			String sourceDirName = "第一批次数据/";
+			String dirPath = "/Users/mcfly/Downloads/";
+			String sourceDirName = "";
 			String disDirName = "第二批次数据/";
 			String suffix = ".xlsx";
 			for (int i = 0; i < strings.length; i++) {
@@ -503,13 +548,13 @@ public class EnterpriseDataTesting {
 	}
 	
 
-	@Test
+//	@Test
 	public void lily_20150529() {// 匹配工业企业数据库数据
 		try {
 			List<Integer> matchIndexs = new ArrayList<Integer>();
-			matchIndexs.add(11);
 			matchIndexs.add(12);
 			matchIndexs.add(13);
+			matchIndexs.add(14);
 			List<String> matchColumns = new ArrayList<String>();
 			matchColumns.add("法人代码");
 			matchColumns.add("法人单位");
@@ -519,7 +564,7 @@ public class EnterpriseDataTesting {
 			enterpriseDataService.lily_20150529(
 					"/Users/mcfly/lily_mcfly/第一批次数据/对外直接投资2007年_" + year,
 					"/Users/mcfly/lily_mcfly/对外直接投资2007年.xlsx", matchIndexs,
-					"t_enterprise_data_" + year, matchColumns, true, 4, 3);
+					"t_enterprise_data_" + year, matchColumns, false, 4, 3);
 			System.out.println("共耗时～～～～" + (System.currentTimeMillis() - now));
 		} catch (Exception e) {
 			e.printStackTrace();

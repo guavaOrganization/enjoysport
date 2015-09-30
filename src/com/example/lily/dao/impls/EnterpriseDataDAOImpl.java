@@ -40,9 +40,8 @@ public class EnterpriseDataDAOImpl implements IEnterpriseDataDAO {
 				List<String> row = new ArrayList<String>();
 				ResultSetMetaData metaData = paramResultSet.getMetaData();
 				int columnCount = metaData.getColumnCount();
-				for (int i = 1; i < columnCount + 1; i++) {
+				for (int i = 1; i <= columnCount; i++) {
 					String columnName = metaData.getColumnName(i);
-					System.out.println("columnName --> " + columnName);
 					if (resultMetaDatasList.size() <= columnCount) { // 查询结果列名添加到resultMetaDatasList中返回
 						resultMetaDatasList.add(columnName);
 					}
@@ -67,9 +66,8 @@ public class EnterpriseDataDAOImpl implements IEnterpriseDataDAO {
 				List<String> row = new ArrayList<String>();
 				ResultSetMetaData metaData = paramResultSet.getMetaData();
 				int columnCount = metaData.getColumnCount();
-				for (int i = 1; i < columnCount + 1; i++) {
+				for (int i = 1; i <= columnCount; i++) {
 					String columnName = metaData.getColumnName(i);
-					System.out.println("columnName --> " + columnName);
 					if (resultMetaDatasList.size() <= columnCount) { // 查询结果列名添加到resultMetaDatasList中返回
 						resultMetaDatasList.add(columnName);
 					}

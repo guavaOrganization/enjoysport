@@ -10,7 +10,7 @@ import com.example.lily.javabeans.QueryDBResultHolder;
 public interface IEnterpriseDataService {
 	public QueryDBResultHolder queryEnterpriseData(String tableName, String matchColumn, String matchValue) throws Exception;
 
-	public List<List<String>> matchingEnterpriseData(List<List<String>> excelDatas, int excelMatchIndex, String year, String dbMatchColName) throws Exception;
+	public List<List<String>> matchingEnterpriseData(List<List<String>> excelDatas, int excelMatchIndex, String year, String dbMatchColName, List<String[]> ignoreDatas) throws Exception;
 
 	public MatchingResultHolder matchingEnterpriseData(List<List<String>> sourceDatas, int startIndex, int endIndex, List<Integer> matchIndexs, String sourceTableName, List<String> matchColumns) throws Exception;
 
